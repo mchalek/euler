@@ -36,7 +36,7 @@ int main(void)
             triplets[ntrip++] = i;
         }
     }
-    printf("%d valid triplets.\n", ntrip);
+    //printf("%d valid triplets.\n", ntrip);
 
     short **trans = malloc(1000*sizeof(short *));
     short *vcount = calloc(1000, sizeof(short));
@@ -73,8 +73,6 @@ int main(void)
     for(i = 0; i < ntrip; i++) {
         int term = triplets[i];
 
-        printf("term count[%d]: %ld\n", i, tcounts[term]);
-        printf("source count[%d]: %ld\n", i, scounts[term]);
         count += tcounts[term] * scounts[term];
     }
 
