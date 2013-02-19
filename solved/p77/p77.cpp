@@ -1,4 +1,5 @@
 #include<cstdio>
+#include<prime.h>
 #include<iostream>
 #include<cstdlib>
 #include<cstring>
@@ -28,9 +29,16 @@ int main(int argc, char **argv)
 	else {
 		N = atoi(argv[1]);
 
-		int denom[] = {1, 2, 5, 10, 20, 50, 100, 200};
+        prime p(1000);
+        vector <int> list = p.primes();
+        int nprimes = list.size();
 
-		cout << "Number of ways to make " << N << " pence: " << Ncomb(N, 8, denom) << endl;
+        int *denom = new int[nprimes];
+        int i;
+        for(i = 0; i < nprimes; i++)
+            denom[i] = list[i];
+
+		cout << "Number of ways to make " << N << " pence: " << Ncomb(N, nprimes, denom) << endl;
 	}
 	return 0;
 }
