@@ -1,3 +1,4 @@
+#include <kmbits.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -13,28 +14,6 @@ typedef struct {
     group_t hlines[9];
     group_t vlines[9];
 } puzz_t;
-
-int _trailz(uint16_t a)
-{
-    int i;
-    for(i = 0; i < 16; i++)
-        if(a & 1)
-            return i;
-        else
-            a >>= 1;
-
-    return 16;
-}
-
-int _popcnt(uint16_t a)
-{
-    int i;
-    int ret = 0;
-    for(i = 0; i < 16; i++)
-        ret += ((1u << i) & a) > 0;
-
-    return ret;
-}
 
 void link_puzz(puzz_t *puzz)
 {
