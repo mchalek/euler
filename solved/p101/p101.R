@@ -10,19 +10,19 @@ for(i in 1:11) {
 
 ans = 0
 for(i in 1:10) {
-	A = M[1:i, 1:i]
-	y = poly[1:i]
+    A = M[1:i, 1:i]
+    y = poly[1:i]
 
-	x = solve(A, y)
-	xpad = matrix(0,1,11)
-	xpad[1:i] = x
+    x = solve(A, y)
+    xpad = matrix(0,1,11)
+    xpad[1:i] = x
 
-	check = M %*% t(xpad)
-	pass = abs(check-poly) < 1e-3
-	FIT_ix = which(pass == F)[1]
-	print(paste("index ", FIT_ix, " value ", check[FIT_ix]))
+    check = M %*% t(xpad)
+    pass = abs(check-poly) < 1e-3
+    FIT_ix = which(pass == F)[1]
+    print(paste("index ", FIT_ix, " value ", check[FIT_ix]))
 
-	ans = ans + check[FIT_ix]
+    ans = ans + check[FIT_ix]
 }
 
 print(ans)
