@@ -6,6 +6,17 @@
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 
+int reverse(int x) {
+    int ret = 0;
+    while(x) {
+        ret *= 10;
+        ret += x % 10;
+        x /= 10;
+    }
+        
+    return ret;
+}
+
 void primes(int N, int **p, int *nprimes) {
     char *isc = calloc(N, sizeof(char));
     int *_p = malloc(N*sizeof(int));
@@ -66,16 +77,6 @@ void get_combos(int x, int (**comb)[2], int *ncomb, int *pr, int npr, bool rever
     }
 }
 
-int reverse(int x) {
-    int ret = 0;
-    while(x) {
-        ret *= 10;
-        ret += x % 10;
-        x /= 10;
-    }
-        
-    return ret;
-}
 
 void combos(int *pr, int npr, int (**comb)[2], int *ncomb) {
     int i;
@@ -104,7 +105,7 @@ typedef struct _group_t {
     int Nb;
 } group_t;
 
-void dedupe(int (*x)[2], int *nx) {
+void uniq(int (*x)[2], int *nx) {
     int ny = 0;
     int ac = 0, bc = 0;
     int i;
@@ -113,7 +114,7 @@ void dedupe(int (*x)[2], int *nx) {
         int a = x[i][0];
         int b = x[i][1];
 
-        if(ac != a && bc != b) {
+        if(ac != a || bc != b) {
             x[ny][0] = a;
             x[ny][1] = b;
             ny++;
@@ -135,17 +136,16 @@ int main(int argc, char **argv) {
 
     combos(pr, npr, &comb, &ncombos);
 
-    comb = realloc(comb, ncombos * sizeof(int [2]));
-
     qsort(comb, ncombos, sizeof(int [2]), cmp);
 
-    dedupe(comb, &ncombos);
+    uniq(comb, &ncombos);
+
+    comb = realloc(comb, ncombos * sizeof(int [2]));
 
     printf("%d unique combos.\n", ncombos);
 
-    printf("first 10: \n");
     int i;
-    for(i = 0; i < 10; i++)
+    for(i = 0; i < ncombos; i++)
         printf("%d/%d\n", comb[i][0], comb[i][1]);
 
     //group(comb, ncombos, gp, cnt, &ngp);
