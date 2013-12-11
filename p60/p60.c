@@ -77,7 +77,6 @@ void get_combos(int x, int (**comb)[2], int *ncomb, int *pr, int npr, bool rever
     }
 }
 
-
 void combos(int *pr, int npr, int (**comb)[2], int *ncomb) {
     int i;
     for(i = 0; i < npr; i++) {
@@ -99,13 +98,7 @@ int cmp(const void *va, const void *vb) {
        return a0 - b0;
 }
 
-typedef struct _group_t {
-    int a;
-    int *b;
-    int Nb;
-} group_t;
-
-void uniq(int (*x)[2], int *nx) {
+void uniq(int (*x)[2], int *nx, int *na) {
     int ny = 0;
     int ac = 0, bc = 0;
     int i;
@@ -113,6 +106,9 @@ void uniq(int (*x)[2], int *nx) {
     for(i = 0; i < *nx; i++) {
         int a = x[i][0];
         int b = x[i][1];
+
+        if(ac != a)
+            (*na)++;
 
         if(ac != a || bc != b) {
             x[ny][0] = a;
@@ -124,6 +120,36 @@ void uniq(int (*x)[2], int *nx) {
     }
 
     *nx = ny;
+}
+
+typedef struct _group_t {
+    int a;
+    int *b;
+    int Nb;
+} group_t;
+
+void group(int (*comb)[2], int ncombos, group_t *g) {
+    int i = 0;
+    int ng = 0;
+
+    while(i < ncombos) {
+        int a = comb[i][0];
+        int j = i;
+        while((j < ncombos) ? comb[j][0] == a : 0)
+            j++;
+
+        int Nb = j-i;
+        g[ng].a = a;
+        g[ng].Nb = Nb;
+        g[ng].b = malloc(Nb*sizeof(int));
+        int k;
+        for(k = 0; k < Nb; k++)
+            g[ng].b[k] = comb[i+k][1];
+
+        ng++;
+        i = j;
+        //printf("found %d combos paired with %d\n", Nb, a);
+    }
 }
 
 int main(int argc, char **argv) {
@@ -138,7 +164,8 @@ int main(int argc, char **argv) {
 
     qsort(comb, ncombos, sizeof(int [2]), cmp);
 
-    uniq(comb, &ncombos);
+    int nhead = 0;
+    uniq(comb, &ncombos, &nhead);
 
     comb = realloc(comb, ncombos * sizeof(int [2]));
 
@@ -148,7 +175,8 @@ int main(int argc, char **argv) {
     for(i = 0; i < ncombos; i++)
         printf("%d/%d\n", comb[i][0], comb[i][1]);
 
-    //group(comb, ncombos, gp, cnt, &ngp);
+    group_t *gp = malloc(nhead * sizeof(group_t));
+    group(comb, ncombos, gp);
 
     return 0;
 }
