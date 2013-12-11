@@ -44,6 +44,11 @@ int isprime(int x, int *pr, int npr)
     if(x == 1)
         return 0;
 
+    if(x > ((long) pr[npr-1])*pr[npr-1]) {
+        printf("Can't check that!  %d\n", x);
+        exit(0);
+    }
+
     for(i = 0; (i < npr) ? pr[i]*pr[i] <= x : 0; i++)
         if(!(x % pr[i]))
             return 0;
@@ -98,7 +103,7 @@ int cmp(const void *va, const void *vb) {
        return a0 - b0;
 }
 
-void uniq(int (*x)[2], int *nx, int *na) {
+void uniq(int (*x)[2], int *nx) {
     int ny = 0;
     int ac = 0, bc = 0;
     int i;
@@ -106,9 +111,6 @@ void uniq(int (*x)[2], int *nx, int *na) {
     for(i = 0; i < *nx; i++) {
         int a = x[i][0];
         int b = x[i][1];
-
-        if(ac != a)
-            (*na)++;
 
         if(ac != a || bc != b) {
             x[ny][0] = a;
@@ -123,37 +125,156 @@ void uniq(int (*x)[2], int *nx, int *na) {
 }
 
 typedef struct _group_t {
-    int a;
-    int *b;
     int Nb;
+    int *b;
 } group_t;
 
-void group(int (*comb)[2], int ncombos, group_t *g) {
-    int i = 0;
-    int ng = 0;
-
-    while(i < ncombos) {
+void group(int (*comb)[2], int ncombos, group_t *g, int N) {
+    int *total_counts = calloc(N, sizeof(int));
+    int i;
+    for(i = 0; i < ncombos; i++) {
         int a = comb[i][0];
-        int j = i;
-        while((j < ncombos) ? comb[j][0] == a : 0)
-            j++;
+        int b = comb[i][1];
+        total_counts[a]++;
+        total_counts[b]++;
+    }
 
-        int Nb = j-i;
-        g[ng].a = a;
-        g[ng].Nb = Nb;
-        g[ng].b = malloc(Nb*sizeof(int));
-        int k;
-        for(k = 0; k < Nb; k++)
-            g[ng].b[k] = comb[i+k][1];
+    for(i = 0; i < N; i++) {
+        g[i].b = malloc(total_counts[i]*sizeof(int));
+        g[i].Nb = 0;
+    }
+    free(total_counts);
 
-        ng++;
-        i = j;
-        //printf("found %d combos paired with %d\n", Nb, a);
+    for(i = 0; i < ncombos; i++) {
+        int a = comb[i][0];
+        int b = comb[i][1];
+
+        g[a].b[g[a].Nb++] = b;
+        g[b].b[g[b].Nb++] = a;
     }
 }
 
+int duped(int chain[], int depth) {
+    int i, j;
+    for(i = 0; i < depth; i++)
+        for(j = i+2; j < depth; j++)
+            if(chain[i] == chain[j])
+                return 1;
+    return 0;
+}
+
+int concatenable(int chain[], int depth, int *pr, int npr) {
+    int i, j;
+
+    for(i = 0; i < depth; i++)
+        for(j = i+2; j < depth; j++) {
+            int c0 = concat(chain[i], chain[j]);
+            if(!isprime(c0, pr, npr))
+                return 0;
+
+            int c1 = concat(chain[j], chain[i]);
+            if(!isprime(c1, pr, npr))
+                return 0;
+        }
+
+    return 1;
+}
+
+int check(int chain[], int depth, int *pr, int npr) {
+    if(duped(chain, depth))
+        return 0;
+
+    return concatenable(chain, depth, pr, npr);
+}
+
+void traverse(int start, int depth, int max_depth, int sum, int *best, int *chain, group_t *gp, int N, int *pr, int npr) {
+    if(sum > *best)
+        return;
+
+    if(depth == max_depth) {
+        *best = sum;
+        printf("valid chain!  ");
+        int i;
+        for(i = 0; i < max_depth; i++) {
+            printf("%d", chain[i]);
+            if(i < max_depth-1)
+                printf(", ");
+        }
+        printf(" <- %d\n", sum);
+        return;
+    }
+
+    int i;
+    if(start >= N) {
+        printf("Error!! start (%d) > N (%d)\n", start, N);
+        exit(0);
+    }
+
+    for(i = 0; i < gp[start].Nb; i++) {
+        int next = gp[start].b[i];
+        chain[depth] = next;
+        if(!check(chain, depth+1, pr, npr))
+            continue;
+
+        traverse(next, depth+1, max_depth, sum + next, best, chain, gp, N, pr, npr);
+    }
+}
+
+void revise(group_t **pgp, int *N, int Nmax, int Nmin) {
+    *pgp = realloc(*pgp, Nmax*sizeof(group_t));
+    group_t *gp = *pgp;
+
+    int i;
+
+    for(i = 0; i < Nmax; i++) {
+        int j;
+        int k = 0;
+
+        for(j = 0; j < gp[i].Nb; j++) {
+            if(gp[i].b[j] < Nmax && gp[i].b[j] > Nmin) {
+                gp[i].b[k++] = gp[i].b[j];
+            }
+        }
+        gp[i].Nb = k;
+        gp[i].b = realloc(gp[i].b, k*sizeof(int));
+    }
+    *N = Nmax;
+}
+
+int min_chain_sum(int max_depth, group_t *gp, int N, int *pr, int npr) {
+    int i, j;
+    if(max_depth == 0)
+        return 0;
+
+    if(max_depth == 1)
+        return 3;
+
+    if(max_depth == 2)
+        return 10;
+
+    int *chain = calloc(max_depth, sizeof(int));
+
+    int best = 1 << 30;
+
+    for(i = 0; i < (N+max_depth-1)/max_depth; i++) {
+        chain[0] = i;
+        for(j = 0; j < gp[i].Nb; j++) {
+            chain[1] = gp[i].b[j];
+            int sum = chain[0] + chain[1];
+            traverse(gp[i].b[j], 2, max_depth, sum, &best, chain, gp, N, pr, npr);
+        }
+
+        if(best < N)
+            revise(&gp, &N, best, i);
+    }
+
+    free(chain);
+
+    return best;
+}
+
 int main(int argc, char **argv) {
-    int N = 10000000;
+    int N = 100000000;
     int *pr, npr;
     primes(N, &pr, &npr);
 
@@ -164,19 +285,16 @@ int main(int argc, char **argv) {
 
     qsort(comb, ncombos, sizeof(int [2]), cmp);
 
-    int nhead = 0;
-    uniq(comb, &ncombos, &nhead);
+    uniq(comb, &ncombos);
 
     comb = realloc(comb, ncombos * sizeof(int [2]));
 
-    printf("%d unique combos.\n", ncombos);
+    group_t *gp = malloc(N * sizeof(group_t));
+    group(comb, ncombos, gp, N);
 
-    int i;
-    for(i = 0; i < ncombos; i++)
-        printf("%d/%d\n", comb[i][0], comb[i][1]);
-
-    group_t *gp = malloc(nhead * sizeof(group_t));
-    group(comb, ncombos, gp);
+    int chainlen = 5;
+    int sum = min_chain_sum(chainlen, gp, N, pr, npr);
+    printf("solution for chain len == %d: %d\n", chainlen, sum);
 
     return 0;
 }
