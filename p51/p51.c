@@ -48,33 +48,49 @@ void to_bcd(int *p, int np, int *maxdig) {
     *maxdig = max;
 }
 
-int mask_bcd(int x, int mask) {
+int to_dec(int bcd) {
     int ret = 0;
     int k = 1;
-    while(mask) {
-        if(mask & k) {
-            ret |= x & (0xff << (4*k));
-            mask ^= k;
-        }
-        k <<= 1;
+    while(bcd) {
+        int digit = bcd & 0xff;
+        ret += digit * k;
+        k *= 10;
+        bcd >>= 4;
     }
 
     return ret;
 }
 
 bool digits_match(int x, int mask) {
-    int k = 1;
+    int k = 0;
     int digits = 0;
     while(mask) {
-        if(mask & k) {
-            int digit = 0xff & (x >> (4*(k-1)));
+        if(mask & (1 << k)) {
+            int digit = 0xff & (x >> (4*k));
             digits |= 1 << digit;
-            mask ^= k;
+            mask ^= (1 << k);
         }
-        k <<= 1;
+        k++;
     }
 
     return _popcnt(digits) == 1;
+}
+
+int condense(int x, int mask) {
+    int ret = 0;
+    int k = 0;
+    int ndig = 0;
+    while(mask) {
+        if(mask & (1 << k)) {
+            int digit = 0xff & (x >> (4*k));
+            mask ^= (1 << k);
+            ret |= digit << (4*ndig);
+            ndig++;
+        }
+        k++;
+    }
+
+    return ret;
 }
 
 int main(void) {
@@ -103,7 +119,12 @@ int main(void) {
             if(!digits_match(p[j], mask))
                 continue;
 
-            //printf("mask %x; digits match: %x\n", mask, p[j]);
+            int cond = condense(p[j], (~mask) & 0xffff);
+
+            int cond_dec = to_dec(cond);
+
+            printf("mask %x; digits match: %x\n", mask, p[j]);
+            printf("\tcondensed to: %x\n", cond);
             z++;
         }
     }
