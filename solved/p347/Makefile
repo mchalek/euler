@@ -1,2 +1,3 @@
-all: p347.c /home/mchale/euler/libs/prime.c
-	gcc -g -O3 -op347 p347.c /home/mchale/euler/libs/prime.c -I/home/mchale/euler/libs/
+CFLAGS=-g -O3 -Wall -Wextra -I/home/kevin/code/euler/libs/
+
+p347: p347.c /home/kevin/code/euler/libs/prime.c

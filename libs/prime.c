@@ -1,13 +1,13 @@
 #include <stdlib.h>
 
-int primes(unsigned int N, unsigned int **p, unsigned int *k)
+void primes(int N, int **p, int *k)
     // simple prime sieve
 {
    int i, j;
-   unsigned char *iscmp = calloc(N, sizeof(char)); 
+   char *iscmp = calloc(N, sizeof(char)); 
    iscmp[0] = 1;
 
-   *p = malloc(N*sizeof(unsigned int));
+   *p = malloc(N*sizeof(int));
    *k = 0;
    
    for(i = 2; i < N; i++) {
@@ -19,6 +19,6 @@ int primes(unsigned int N, unsigned int **p, unsigned int *k)
        }
    }
 
-   *p = realloc(*p, (*k) * sizeof(unsigned int));
+   *p = realloc(*p, (*k) * sizeof(int));
    free(iscmp);
 }
