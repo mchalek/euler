@@ -2,14 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_COINS 10000
-#define TARGET_MULTIPLE 100
+#define MAX_COINS 100000
+#define TARGET_MULTIPLE 1000000
 
-void count_ways() {
+int main(void) {
     // counts[l] is the number of ways of splitting up k coins such that
     // the largest group size is l
     long *old_counts = calloc(MAX_COINS+1, sizeof(long));
     long *new_counts = calloc(MAX_COINS+1, sizeof(long));
+    long *tmp;
 
     int group_size;
 
@@ -24,42 +25,31 @@ void count_ways() {
             int n = group_count * group_size;
             int l;
             for(l = 0; l <= MAX_COINS-n; l++) {
-                new_counts[l+n] += old_counts[l] % TARGET_MULTIPLE;
+                new_counts[l+n] += old_counts[l];
             }
         }
 
+        int i;
+        for(i = 0; i <= MAX_COINS; i++) {
+            new_counts[i] %= TARGET_MULTIPLE;
+        }
+
         printf("%ld ways with %d coins!\n", new_counts[group_size], group_size);
-        if(new_counts[group_size] % TARGET_MULTIPLE == 0) {
+        if(!(new_counts[group_size] % TARGET_MULTIPLE)) {
             printf("BOOYAH!\n");
             exit(0);
         }
         fflush(stdout);
+        
+        tmp = old_counts;
+        old_counts = new_counts;
+        new_counts = tmp;
 
-        memcpy(old_counts, new_counts, (MAX_COINS+1)*sizeof(long));
         memset(new_counts, 0, (MAX_COINS+1)*sizeof(long));
     }
 
     free(new_counts);
     free(old_counts);
-    return;
-}
 
-int main(void) {
-    int k;
-
-    /*
-    for(k = 1; k < MAX_COINS; k++) {
-        long ways = count_ways(k);
-        printf("%ld ways with %d coins!\n", ways, k);
-        if(ways % TARGET_MULTIPLE == 0) {
-            printf("booyah!\n");
-            exit(0);
-        }
-    }*/
-    count_ways();
-            /*
-    for(k = 1; k < MAX_COINS; k++) {
-        long ways = count_ways(k);
-    }*/
-
+    return 0;
 }
