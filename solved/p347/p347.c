@@ -7,19 +7,19 @@
 
 int main(void)
 {
-    unsigned int i, j, k, *p;
-    unsigned int **table;
-    unsigned int *ntable;
-    unsigned long tmp;
-    unsigned int pqmax;
-    unsigned long pqtest;
+    int i, j, k, *p;
+    int **table;
+    int *ntable;
+    long tmp;
+    int pqmax;
+    long pqtest;
     int pm, qn;
-    unsigned long SN;
+    long SN;
 
     primes(N/2, &p, &k);
 
-    table = malloc(k*sizeof(unsigned int *));
-    ntable = malloc(k*sizeof(unsigned int));
+    table = malloc(k*sizeof(int *));
+    ntable = malloc(k*sizeof(int));
 
     // first build table of powers of each prime less than N/2
     for(i = 0; i < k; i++) {
@@ -30,7 +30,7 @@ int main(void)
             ntable[i]++;
         } while(tmp*p[i] < N/2);
 
-        table[i] = malloc(ntable[i]*sizeof(unsigned int));
+        table[i] = malloc(ntable[i]*sizeof(int));
         
         table[i][0] = p[i];
         for(j = 1; j < ntable[i]; j++) {
@@ -42,11 +42,12 @@ int main(void)
     // products within the bound
     SN = 0;
     for(i = 0; i < k; i++) {
-        for(j = i+1; j < k && ((unsigned long) p[i])*p[j] < N; j++) {
+        for(j = i+1; j < k && ((long) p[i])*p[j] < N; j++) {
             pqmax = 0;
+            pqtest = -1;
             for(pm = 0; pm < ntable[i]; pm++) {
                 for(qn = ntable[j]-1; qn >= 0; qn--) {
-                    if((pqtest=((unsigned long) table[i][pm])*table[j][qn]) <= N)
+                    if((pqtest=((long) table[i][pm])*table[j][qn]) <= N)
                         break;
                 }
                 pqmax = (pqmax < pqtest && pqtest <= N) ? pqtest : pqmax;
@@ -57,9 +58,5 @@ int main(void)
     }
 
     printf("S(%d) == %ld\n", N, SN);
-
-
-
-    
-
+    return 0;
 }
