@@ -12,7 +12,7 @@
 
 #define NMAX 100
 
-#define BASE 1000000
+#define BASE 1000
 int main(void)
 {
     int **c = malloc(NMAX*sizeof(int *));
@@ -48,5 +48,7 @@ int main(void)
 
     for(i = 0; i < NMAX; i++)
         printf("s[%d] == %d\n", i+1, s[i]);
+
+    return 0;
 }
 
