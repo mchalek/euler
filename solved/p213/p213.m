@@ -1,36 +1,46 @@
-N = 30;
-Nb = 50;
-
+function p213
 tic;
-A = sparse(N^2,N^2);
-for j = 1:N,
-    for i = 1:N,
-        a = i + (j-1)*N;
-        if i > 1,
-            b = i-1 + N*(j-1);
-            A(a, b) = 0.25;
-        end;
-        if i < N,
-            b = i+1 + N*(j-1);
-            A(a, b) = 0.25;
-        end;
-        if j > 1,
-            b = i + N*(j-2);
-            A(a, b) = 0.25;
-        end;
-        if j < N,
-            b = i + N*j;
-            A(a, b) = 0.25;
+% First generate transition matrix.
+P = zeros(900);
+for i = 1:30
+    for j = 1:30
+        if i == 1 && j == 1 % top left corner
+            P(i + 1 + (j-1)*30, i + (j-1)*30) = 0.5;
+            P(i + j*30, i + (j-1)*30) = 0.5;
+        elseif i == 30 && j == 1 % bottom left corner
+            P(i - 1 + (j-1)*30, i + (j-1)*30) = 0.5;
+            P(i + j*30, i + (j-1)*30) = 0.5;
+        elseif i == 1 && j == 30 % top right corner
+            P(i + 1 + (j-1)*30, i + (j-1)*30) = 0.5;
+            P(i + (j-2)*30, i + (j-1)*30) = 0.5;
+        elseif i == 30 && j == 30 % bottom right corner
+            P(i - 1 + (j-1)*30, i + (j-1)*30) = 0.5;
+            P(i + (j-2)*30, i + (j-1)*30) = 0.5;
+        elseif i == 1 % top edge
+            P(i + 1 + (j-1)*30, i + (j-1)*30) = 1/3;
+            P(i + (j-2)*30, i + (j-1)*30) = 1/3;
+            P(i + j*30, i + (j-1)*30) = 1/3;
+        elseif i == 30 % bottom edge
+            P(i - 1 + (j-1)*30, i + (j-1)*30) = 1/3;
+            P(i + (j-2)*30, i + (j-1)*30) = 1/3;
+            P(i + j*30, i + (j-1)*30) = 1/3;
+        elseif j == 1 % left edge
+            P(i - 1 + (j-1)*30, i + (j-1)*30) = 1/3;
+            P(i + 1 + (j-1)*30, i + (j-1)*30) = 1/3;
+            P(i + j*30, i + (j-1)*30) = 1/3;
+        elseif j == 30 % right edge
+            P(i - 1 + (j-1)*30, i + (j-1)*30) = 1/3;
+            P(i + 1 + (j-1)*30, i + (j-1)*30) = 1/3;
+            P(i + (j-2)*30, i + (j-1)*30) = 1/3;        
+        else % internal
+            P(i - 1 + (j-1)*30, i + (j-1)*30) = 0.25;
+            P(i + 1 + (j-1)*30, i + (j-1)*30) = 0.25;
+            P(i + j*30, i + (j-1)*30) = 0.25;
+            P(i + (j-2)*30, i + (j-1)*30) = 0.25;
         end;
     end;
 end;
-
-for i = 1:N^2,
-    A(:, i) = A(:, i) / sum(A(:, i));
-end;
-
-Pi = ones(N^2, 1);
-
-Pf = A^Nb*Pi;
-
-fprintf('Execution time: %gs\n', toc);
+P = sparse(P);
+P50 = P^50;
+fprintf('Expected number of empty: %.10g\n', sum(prod(1-P50,2)));
+toc
