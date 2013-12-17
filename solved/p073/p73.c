@@ -35,7 +35,7 @@ void subtract_noncoprime(int *counts, int p, int my_primes[], int nprimes, char 
 int max_allowed(int x) {
     int i;
     int ret = 0;
-    for(i = 1; i < x; i++) {
+    for(i = x/3; i < (x+1)/2; i++) {
         ret += (3*i > x && 2*i < x);
     }
 
