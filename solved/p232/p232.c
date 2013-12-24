@@ -23,11 +23,13 @@ double qnm(int n, int m, int T) {
     } else if(n == 99 && m2 >= 100) {
         return 2.0 / (T2 + 1);
     } else *((int *) NULL) = 1;
+
+    return -1;
 }
 
 double get_best_q(int n, int m) {
     int T;
-    int best_T = 0;
+    //int best_T = 0;
     double best_q = 0.0;
     T = 0;
     do {
@@ -36,11 +38,11 @@ double get_best_q(int n, int m) {
 
         if(test_q > best_q) {
             best_q = test_q;
-            best_T = T;
+            //best_T = T;
         }
     } while(m + (1 << (T-1)) < 100);
 
-    printf("T(%d,%d) == %d\n", n, m, best_T);
+    //printf("T(%d,%d) == %d\n", n, m, best_T);
     return best_q;
 }
 
@@ -67,9 +69,12 @@ int main(void) {
         }
     }
 
+    /*
     for(n = 100; n >= 0; n--)
         for(m = 100; m >= 0; m--)
             printf("q(%d,%d) == %g\n", n, m, q[n][m]);
+*/
+    printf("solution: %.8f\n", 0.5*(q[1][0] + q[0][0]));
 
-    printf("solution: %.12f\n", 0.5*(q[1][0] + q[0][0]));
+    return 0;
 }
