@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define N 1000000
+#define N 60000000
+#define maxD 1000
+
 typedef struct {
     int (*factors)[2];
     int nf;
@@ -36,25 +39,118 @@ void factor() {
                 iscomposite[k] = 1;
             }
         }
+        factors[i].factors = realloc(factors[i].factors, factors[i].nf * sizeof(int [2]));
+    }
+
+}
+
+void merge(factor_t a, factor_t b, factor_t *m) {
+    memset(m -> factors, 0, 10*sizeof(int [2]));
+    m -> nf = 0;
+
+    int i;
+    for(i = 0; i < a.nf; i++) {
+        int ind = m -> nf++;
+        m -> factors[ind][0] = a.factors[i][0];
+        m -> factors[ind][1] = a.factors[i][1];
+    }
+
+    // get shared factors
+    for(i = 0; i < b.nf; i++) {
+        int j;
+        char done = 0;
+        for(j = 0; j < m -> nf; j++) {
+            if(m -> factors[j][0] == b.factors[i][0]) {
+                m -> factors[j][1] += b.factors[i][1];
+                done = 1;
+                break;
+            }
+        }
+
+        if(!done) {
+            int ind = m -> nf++;
+            m -> factors[ind][0] = b.factors[i][0];
+            m -> factors[ind][1] = b.factors[i][1];
+        }
     }
 }
 
-int main(int argc, char **argv) {
-    if(argc < 2) {
-        printf("SYNTAX: %s x\n", argv[0]);
-        exit(0);
-    }
+int ipow(int x, int y) {
+    if(!y)
+        return 1;
 
-    factor();
+    return x*ipow(x, y-1);
+}
 
-    int x = atoi(argv[1]);
-
-    printf("%d prime factors of %d: ", factors[x].nf, x);
+int build(factor_t a, int x, int x_sol[], int count[], int start, long y) {
     int i;
-    for(i = 0; i < factors[x].nf; i++) {
-        printf("%d^%d  ", factors[x].factors[i][0], factors[x].factors[i][1]);
+    int ret = 0;
+
+    if(start == a.nf) {
+        long D = (((long) x)*x - 1) / (y*y);
+        if(D > 1000)
+            return 0;
+
+        printf("%d^2 - %ld %ld^2 == 1\n", x, D, y);
+
+        if(D < maxD) {
+            if(!x_sol[D]) {
+                x_sol[D] = x;
+                ret = 1;
+            }
+        }
+
+        return ret;
     }
-    printf("\n");
+
+    for(i = 0; i <= a.factors[start][1]; i += 2) {
+        count[start] = i;
+        ret += build(a, x, x_sol, count, start+1, y*ipow(a.factors[start][0], i/2));
+    }
+    count[start] = 0;
+
+    return ret;
+}
+
+int main(void) {
+    factor();
+    
+    int *x_sol = calloc(maxD, sizeof(int));
+    int x, nD = 0;
+
+    factor_t merged;
+    merged.factors = calloc(10, sizeof(int [2]));
+    merged.nf = 0;
+
+    int zeros[10];
+    memset(zeros, 0, sizeof(zeros));
+
+    x = 1;
+    while(nD < 1000) {
+        x++;
+        if(x + 1 >= N) {
+            printf("complete solution not found.  Increase N and try again.\n");
+            break;
+        }
+
+        merge(factors[x-1], factors[x+1], &merged);
+        nD += build(merged, x, x_sol, zeros, 0, 1);
+
+#if 0
+        printf("merged factors for (%d - 1) * (%d + 1): ", x, x);
+        int i;
+        for(i = 0; i < merged.nf; i++) {
+            printf("%d^%d  ", merged.factors[i][0], merged.factors[i][1]);
+        }
+        printf("\n");
+#endif
+    }
+
+    printf("found %d solutions\n", nD);
+    int D;
+    for(D = 2; D < 20; D++) {
+        printf("x(%d) == %d\n", D, x_sol[D]);
+    }
 
     return 0;
 }
