@@ -23,4 +23,4 @@ for j = 1:k/2
     p2 = p2 + exp(h);
 end;
 toc
-round((1-(p1+p2))*1e10)/1e10
+fprintf('%.12f\n', round((1-(p1+p2))*1e10)/1e10);
