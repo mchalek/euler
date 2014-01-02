@@ -1,73 +1,116 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
-#define N 60000000
-#define maxD 1000
+#define N 20000000
+#define Np 100000 // num primes only need be ~ sqrt(N)
+#define maxD 1001
 
 typedef struct {
-    int (*factors)[2];
+    int factors[10][2];
     int nf;
 } factor_t;
 
-factor_t *factors = NULL;
+int *primes = NULL;
+int np = 0;
 
 int nlogi(int n, int i) {
-    if(n % i)
-        return 0;
+    int ret = 0;
+    if(i == 1)
+        return n;
 
-    else return 1 + nlogi(n/i, i);
+    while(!(n % i)) {
+        ret++;
+        n /= i;
+    }
+
+    return ret;
 }
 
-void factor() {
-    char *iscomposite = calloc(N, sizeof(char));
-    factors = malloc(N*sizeof(factor_t));
+long ipow(long x, long y) {
     int i;
-    for(i = 2; i < N; i++) {
-        // 10 primes guaranteed to fit; overflows int32
-        factors[i].factors = calloc(10, sizeof(int [2]));
-        factors[i].nf = 0;
-    }
+    if(!y)
+        return 1;
 
-    for(i = 2; i < N; i++) {
+    long ret = x;
+    for(i = 1; i < y; i++)
+        ret *= x;
+
+    return ret;
+}
+
+void compute_primes() {
+    char *iscomposite = calloc(Np, sizeof(char));
+    int nalloc = Np / 10;
+    np = 0;
+    primes = malloc(nalloc*sizeof(int));
+
+    int i;
+    for(i = 2; i < Np; i++) {
         if(!iscomposite[i]) {
-            int k;
-            for(k = i; k < N; k += i) {
-                int ind = factors[k].nf++;
-                factors[k].factors[ind][0] = i;
-                factors[k].factors[ind][1] = nlogi(k, i);
-                iscomposite[k] = 1;
+            primes[np++] = i;
+
+            int j;
+            for(j = 2*i; j < Np; j += i)
+                iscomposite[j] = 1;
+
+            if(np == nalloc) {
+                nalloc *= 2;
+                primes = realloc(primes, nalloc*sizeof(int));
             }
         }
-        factors[i].factors = realloc(factors[i].factors, factors[i].nf * sizeof(int [2]));
     }
 
+    free(iscomposite);
+    primes = realloc(primes, np*sizeof(int));
+}
+
+void factor(int x, factor_t *f) {
+    memset(f -> factors, 0, sizeof(f -> factors));
+    f -> nf = 0;
+
+    int i, p;
+    for(i = 0; i < np && x > 1; i++) {
+        p = primes[i];
+        if(p*p > x)
+            break;
+
+        if(!(x % p)) {
+            int exponent = nlogi(x, p);
+            int ind = f -> nf++;
+
+            f -> factors[ind][0] = p;
+            f -> factors[ind][1] = exponent;
+            x /= ipow(p, exponent);
+        }
+    }
+
+    if(x > 1) { // residual must be prime
+        int ind = f -> nf++;
+        f -> factors[ind][0] = x;
+        f -> factors[ind][1] = 1;
+    }
 }
 
 void merge(factor_t a, factor_t b, factor_t *m) {
-    memset(m -> factors, 0, 10*sizeof(int [2]));
-    m -> nf = 0;
-
     int i;
-    for(i = 0; i < a.nf; i++) {
-        int ind = m -> nf++;
-        m -> factors[ind][0] = a.factors[i][0];
-        m -> factors[ind][1] = a.factors[i][1];
-    }
+    memcpy(m -> factors, a.factors, sizeof(a.factors));
+    m -> nf = a.nf;
 
     // get shared factors
     for(i = 0; i < b.nf; i++) {
         int j;
-        char done = 0;
+        char inserted = 0;
         for(j = 0; j < m -> nf; j++) {
             if(m -> factors[j][0] == b.factors[i][0]) {
                 m -> factors[j][1] += b.factors[i][1];
-                done = 1;
+                inserted = 1;
                 break;
             }
         }
 
-        if(!done) {
+        if(!inserted) {
             int ind = m -> nf++;
             m -> factors[ind][0] = b.factors[i][0];
             m -> factors[ind][1] = b.factors[i][1];
@@ -75,66 +118,66 @@ void merge(factor_t a, factor_t b, factor_t *m) {
     }
 }
 
-int ipow(int x, int y) {
-    if(!y)
-        return 1;
-
-    return x*ipow(x, y-1);
-}
-
-int build(factor_t a, int x, int x_sol[], int count[], int start, long y) {
+int build(factor_t a, int x, int x_sol[], int start, long D) {
+    // finds D, y such that a == D*y^2
     int i;
     int ret = 0;
 
     if(start == a.nf) {
-        long D = (((long) x)*x - 1) / (y*y);
-        if(D > 1000)
-            return 0;
-
-        printf("%d^2 - %ld %ld^2 == 1\n", x, D, y);
-
-        if(D < maxD) {
-            if(!x_sol[D]) {
-                x_sol[D] = x;
-                ret = 1;
-            }
+        if(!x_sol[D]) {
+            x_sol[D] = x;
+            ret = 1;
         }
 
         return ret;
     }
 
-    for(i = 0; i <= a.factors[start][1]; i += 2) {
-        count[start] = i;
-        ret += build(a, x, x_sol, count, start+1, y*ipow(a.factors[start][0], i/2));
+    int p = a.factors[start][0];
+    int exponent = a.factors[start][1];
+
+    for(i = 0; i <= exponent; i += 2) {
+        long new_D = D*ipow(p, exponent - i);
+        if(new_D < maxD)
+            ret += build(a, x, x_sol, start+1, new_D);
     }
-    count[start] = 0;
 
     return ret;
 }
 
 int main(void) {
-    factor();
+    compute_primes();
     
     int *x_sol = calloc(maxD, sizeof(int));
-    int x, nD = 0;
+    int x, nD = 0; // start nD at 32 for the squares
 
-    factor_t merged;
-    merged.factors = calloc(10, sizeof(int [2]));
-    merged.nf = 0;
+    while(nD*nD < maxD)
+        nD++;
+    nD--;
+    int nsol = nD;
 
-    int zeros[10];
-    memset(zeros, 0, sizeof(zeros));
+    factor_t a, merged, queue[2];
+
 
     x = 1;
+    factor(1, queue);
+    factor(2, queue+1);
     while(nD < 1000) {
+        if(!(x % 10000000)) {
+            printf("after x %d, nD == %d\n", x, nD);
+        }
         x++;
         if(x + 1 >= N) {
             printf("complete solution not found.  Increase N and try again.\n");
             break;
         }
 
-        merge(factors[x-1], factors[x+1], &merged);
-        nD += build(merged, x, x_sol, zeros, 0, 1);
+        a = queue[0];
+        queue[0] = queue[1];
+        factor(x+1, queue + 1);
+
+        merge(a, queue[1], &merged);
+
+        nD += build(merged, x, x_sol, 0, 1);
 
 #if 0
         printf("merged factors for (%d - 1) * (%d + 1): ", x, x);
@@ -146,11 +189,21 @@ int main(void) {
 #endif
     }
 
-    printf("found %d solutions\n", nD);
     int D;
-    for(D = 2; D < 20; D++) {
+    int maxx = 0;
+    int Dstar = 0;
+    for(D = 1; D < maxD; D++) {
         printf("x(%d) == %d\n", D, x_sol[D]);
+        if(x_sol[D] > maxx) {
+            maxx = x_sol[D];
+            Dstar = D;
+        }
+        if(x_sol[D] != 0)
+            nsol++;
     }
+
+    printf("found %d solutions (%d)\n", nD, nsol);
+    printf("max at D == %d, x == %d\n", Dstar, maxx);
 
     return 0;
 }
