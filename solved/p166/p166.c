@@ -3,6 +3,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+// - first construct all rows, sort by row count
+// - group rows with like counts to form half-grids
+// - form sorted list of lower half-grids, respecting equivalences across
+//   diagonals that do not matter; count equivalent repeats and bin into
+//   [grid, count] pairs
+// - loop over upper half grids and binary search for matching lower half-grids,
+//   accumulating count
+
 typedef union halfgrid {
     struct explicit {
         int8_t colsums[4];
@@ -197,6 +205,7 @@ int main(void) {
 
         result += match_em_up(hgrids, ngrid, grids_with_counts, n_lower, i);
 
+        free(hgrids);
         free(grids_with_counts);
     }
 
