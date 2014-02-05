@@ -130,9 +130,6 @@ void compute_target(uint64_t grid, int8_t total, uint64_t *out) {
     hout.explicit.colsums[2] = total-columns[2];
     hout.explicit.colsums[3] = total-columns[3];
 
-    // ARGH! comparator isn't right, shouldn't care about two of the colsums
-    // exhaust top  half and find bottom half => don't care about diag[1] and diag[3]
-    // also use comparator in uniq_dc
     hout.explicit.diagsums[1] = total-diag[3];
     hout.explicit.diagsums[2] = total-diag[0];
 
