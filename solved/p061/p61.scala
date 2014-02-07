@@ -1,3 +1,5 @@
+// kind of a dumb exhaust, with some super-inefficient code mixed in, but
+// whatever, runtime < 20 sec
 val n = (1 to 1000).toList
 
 def mkItems(f: Int => Int) = { n.map(f).filter(x => x > 999 && x < 10000) }
