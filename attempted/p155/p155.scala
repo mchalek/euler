@@ -32,6 +32,8 @@ object P155 {
     k: Long = 1,
     counts: Map[Long, Set[Fraction]] = Map(1l -> Set(Fraction(60, 1)))): Set[Fraction] = {
 
+    println(s"current depth is $k")
+
     if(n == k)
       return Set(Fraction(60, 1))
 
