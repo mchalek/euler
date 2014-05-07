@@ -38,9 +38,9 @@ case class Fraction(num: Long, den: Long) extends Ordered[Fraction] {
     val newNum = num * that.den + den * that.num
     val newDen = den * that.den 
     if(newNum % newDen == 0)
-      Fraction(newNum / newDen, 1).partialReduce
+      Fraction(newNum / newDen, 1)
     else if (newDen % newNum == 0)
-      Fraction(1, newDen / newNum).partialReduce
+      Fraction(1, newDen / newNum)
     else
       Fraction(newNum, newDen).partialReduce
   }
