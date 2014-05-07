@@ -2,15 +2,15 @@ import scala.annotation.tailrec
 import scala.collection.breakOut
 
 case class State(x: Double, y: Double, heading: Int) {
-  def tol = 1e-3
+  def tol = 1e-7
   override def equals(a: Any) =
     a match {
       case State(ax, ay, ah) => math.abs(ax-x) < tol && math.abs(ay-y) < tol && ah == heading
       case _ => false
     }
 
-  val ix = math.round(x)
-  val iy = math.round(y)
+  val ix = math.round(x*1e6)
+  val iy = math.round(y*1e6)
 
   override def hashCode = ix.hashCode ^ iy.hashCode ^ heading.hashCode
 
@@ -21,7 +21,7 @@ case class State(x: Double, y: Double, heading: Int) {
       case _ => sys.error("Could not find valid increment in deltas table!")
     }
 
-  def complement = State(x, y, -heading)
+  def complement = State(-x, -y, 5-heading)
 }
 
 object P208 {
@@ -52,48 +52,48 @@ object P208 {
     if(numSteps == maxSteps)
       return prev
 
-    val updated = prev.foldLeft(Seq.empty[(State, Long)]) { case (acc, (state, count)) =>
+    val condensed = scala.collection.mutable.Map.empty[State, Long]
+
+    prev.foreach { case (state, count) =>
       val possible = state.possible
-      acc ++ possible.map { s => (s, count) }
+      possible.foreach { s => 
+        val old = condensed.getOrElse(s, 0l)
+        condensed(s) = old + count
+      }
     }
 
-    val condensed = updated.groupBy { case (state, count) => state }.map { case (state, valueSeq) => 
-      state -> valueSeq.foldLeft(0L) { case (acc, (_, count)) => acc + count }
-    }
-
-    println(s"${condensed.size} possible states at depth ${1 + numSteps}.  diving deeper!")
-    pathCounts(maxSteps, condensed, 1 + numSteps)
+    //println(s"${condensed.size} possible states at depth ${1 + numSteps}.  diving deeper!")
+    pathCounts(maxSteps, condensed.toMap, 1 + numSteps)
   }
 
   def countClosedPaths(maxSteps: Int)(implicit deltas: Map[Int, IndexedSeq[(Double, Double, Int)]]): Long =
     pathCounts(maxSteps).getOrElse(State(0.0, 0.0, 0), 0)
 
-  /*
   def splitCountClosedPaths(
+    polySides: Int,
     maxSteps: Int)(
     implicit deltas: Map[Int, IndexedSeq[(Double, Double, Int)]]): Long = {
       require(maxSteps % 2 == 0, "Split count method only works with even maxSteps!")
 
-      val splitPaths = pathCounts(maxSteps / 2)
-
-      splitPaths.foldLeft(0l) { case (acc, (fwdState, count)) =>
+      val headingPaths = (0 until polySides).map { h0 =>
+        h0 -> pathCounts(maxSteps / 2, Map(State(0.0, 0.0, h0) -> 1))
+      }.toMap
+      
+      val target = State(0.0, 0.0, 0)
+      headingPaths(0).foldLeft(0l) { case (acc, (fwdState, count)) =>
         val revState = fwdState.complement
-        val revCount = splitPaths.getOrElse(revState, 0l)
+        val revCount =
+          headingPaths(fwdState.heading).getOrElse(revState.copy(heading=0), 0l)
 
-        acc + count*revCount
+        acc + count * revCount
       }
-  }*/
+  }
 }
 
 val polygonSides = 5
-val pathLength = 25
+val pathLength = 70
 val deltas = P208.computeDeltas(polygonSides)
-val closedPaths = P208.countClosedPaths(pathLength)(deltas)
-//val splitClosedPaths = Circulog.splitCountClosedPaths(pathLength)(deltas)
-println(s"$closedPaths closed paths of length $pathLength")
-//println(s"via split method: $splitClosedPaths")
-/*
-counts.foreach { case (item @ State(x, y, heading), count) => 
-  val hit = State(0.0, 0.0, 0) == item
-  println(s"($x, $y) @ $heading -> $count ($hit)")
-}*/
+//val closedPaths = P208.countClosedPaths(pathLength)(deltas)
+val splitClosedPaths = P208.splitCountClosedPaths(polygonSides, pathLength)(deltas)
+//println(s"$closedPaths closed paths of length $pathLength")
+println(s"solution via split method: $splitClosedPaths")
