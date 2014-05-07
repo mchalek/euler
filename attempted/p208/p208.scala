@@ -24,7 +24,7 @@ case class State(x: Double, y: Double, heading: Int) {
   def complement = State(x, y, -heading)
 }
 
-object Circulog {
+object P208 {
   def computeDeltas(polySides: Int): Map[Int, IndexedSeq[(Double, Double, Int)]] = {
     require(360 % polySides == 0, "For now we only support polygons with integer (degree) arc angles!")
 
@@ -87,8 +87,8 @@ object Circulog {
 
 val polygonSides = 5
 val pathLength = 25
-val deltas = Circulog.computeDeltas(polygonSides)
-val closedPaths = Circulog.countClosedPaths(pathLength)(deltas)
+val deltas = P208.computeDeltas(polygonSides)
+val closedPaths = P208.countClosedPaths(pathLength)(deltas)
 //val splitClosedPaths = Circulog.splitCountClosedPaths(pathLength)(deltas)
 println(s"$closedPaths closed paths of length $pathLength")
 //println(s"via split method: $splitClosedPaths")
