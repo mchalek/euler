@@ -2,12 +2,14 @@
 #include <string.h>
 #include <stdlib.h>
 
-int factorials[11];
+#define LHS_SIZE 11
+
+int factorials[1 + LHS_SIZE];
 void init_factorials()
 {
     int i;
     factorials[0] = 1;
-    for(i = 1; i <= 10; i++) {
+    for(i = 1; i <= LHS_SIZE; i++) {
         factorials[i] = factorials[i-1]*i;
     }
 
@@ -20,12 +22,12 @@ void breakdown(int digits[], int *count, int *dsum)
     memset(dcounts, 0, sizeof(dcounts));
     int i;
     *dsum = 0;
-    for(i = 0; i < 10; i++) {
+    for(i = 0; i < LHS_SIZE; i++) {
         dcounts[digits[i]]++;
         *dsum += digits[i]*digits[i];
     }
 
-    *count = factorials[10];
+    *count = factorials[LHS_SIZE];
     for(i = 0; i < 10; i++)
         *count /= factorials[dcounts[i]];
 }
@@ -43,28 +45,19 @@ inline int dsum(long num) {
 
 void traverse(int position, int last, int digits[], int nsq, int *squares, long *left_counts) {
     int i;
-    if(position == 10) {
+    if(position == LHS_SIZE) {
         int count, dsum;
 
-        if(left_counts) {
-            breakdown(digits, &count, &dsum);
-            for(i = 0; i < nsq; i++) {
-                int diff = squares[i] - dsum;
-                if(diff >= 0)
-                    left_counts[diff] += count;
-            }
-        } else {
-            breakdown(digits, &count, &dsum);
-            printf("digits:");
-            for(i = 0; i < 10; i++) {
-                printf(" %d", digits[i]);
-            }
-
-            printf(" -> %d [%d]\n", dsum, count);
+        breakdown(digits, &count, &dsum);
+        for(i = 0; i < nsq; i++) {
+            int diff = squares[i] - dsum;
+            if(diff >= 0)
+                left_counts[diff] += count;
         }
 
         return;
     }
+
     for(i = last; i < 10; i++) {
         digits[position] = i;
         traverse(position + 1, i, digits, nsq, squares, left_counts);
@@ -72,7 +65,6 @@ void traverse(int position, int last, int digits[], int nsq, int *squares, long 
 }
 
 int main(void) {
-    int digits[10];
     init_factorials();
 
     // squares must be <= 81*20 == 1620 < 41^2
@@ -83,10 +75,11 @@ int main(void) {
         squares[i-1] = i*i;
     }
 
+    int digits[11];
     traverse(0, 0, digits, 40, squares, left_counts);
     long sum=0l;
     long rhs;
-    for(rhs = 0; rhs < 10000000000l; rhs++) {
+    for(rhs = 0; rhs < 1000000000l; rhs++) {
         sum += left_counts[dsum(rhs)] * rhs;
         sum %= 1000000000;
 
