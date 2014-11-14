@@ -1,6 +1,7 @@
 #include <prime.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #define ELEMENT_INDEX 10000
 #define N 100000
@@ -27,7 +28,7 @@ int cmp_rad(const void *va, const void *vb)
 int main()
 {
     long *p, np;
-    primes(N, &p, &np);
+    primes((long) ceil(sqrt(N)), &p, &np);
 
     nr_t *rad = malloc((N+1)*sizeof(nr_t));
     rad[0].n = 0;
