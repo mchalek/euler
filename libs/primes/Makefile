@@ -1,2 +1,6 @@
-all: prime.c
-	gcc -Wall -Wextra -g -O3 -c prime.c
+CFLAGS=-Wall -Wextra -g -O3
+
+all: libprime.a
+
+libprime.a: prime.o
+	ar r libprime.a prime.o
