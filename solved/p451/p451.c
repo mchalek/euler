@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define MAX 20000000ul
-//#define MAX 101ul
+//#define MAX 20000000ul
+#define MAX (61ul*61ul*61ul)
 
 void factorize(uint64_t n, uint64_t factors[], int powers[], int *nfact, uint64_t primes[], int np)
 {
