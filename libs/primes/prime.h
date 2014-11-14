@@ -1,7 +1,10 @@
-
 #ifndef __PRIME_H
 #define __PRIME_H
 
-int primes(int N, int **p, int *k);
+void primes(long N, long **p, long *k);
+
+long nlogi(long n, long i);
+long ipow(long x, long y);
+void factor(long x, long primes[], long np, long *nfactors, long pfactors[], long exponents[]);
 
 #endif
