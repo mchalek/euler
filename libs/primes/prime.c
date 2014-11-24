@@ -81,3 +81,40 @@ void factor(
     }
 }
 
+long num_proper_divisors(long nf, long exponents[])
+{
+    long ret = 1l;
+    long i;
+
+    for(i = 0; i < nf; i++)
+        ret *= (exponents[i]+1);
+
+    return ret;
+}
+
+static void accum_divisors(long total, long nf, long factors[], long exponents[], long *nout, long *out) {
+    if(nf <= 0) {
+        out[*nout] = total;
+        (*nout)++;
+
+        return;
+    }
+
+    long i;
+    for(i = 0; i <= exponents[nf-1]; i++) {
+        accum_divisors(total, nf-1, factors, exponents, nout, out);
+
+        total *= factors[nf-1];
+    }
+}
+
+void divisors(long nf, long factors[], long exponents[], long *nd_out, long **divisors_out) {
+    long npd = num_proper_divisors(nf, exponents);
+    long *divisors = malloc(npd*sizeof(long));
+    long zero = 0;
+
+    accum_divisors(1l, nf, factors, exponents, &zero, divisors);
+
+    *nd_out = npd;
+    *divisors_out = divisors;
+}
