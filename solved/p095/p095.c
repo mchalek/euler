@@ -72,6 +72,7 @@ int main(void)
             printf("amicable chain: ");
             for(j = 0; j < chain_len[i]; j++) {
                 printf("%ld ", chain[j]);
+                chain_len[chain[j]] = chain_len[i];
             }
             printf("\n");
 
