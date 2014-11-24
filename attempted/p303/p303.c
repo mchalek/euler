@@ -1,95 +1,230 @@
 #include <stdio.h>
-#include <stdint.h>
+#include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
-#define N 10000
+#define N 300
+#define MAX_A 100000
 
-void doit(size_t ntest, uint64_t *test, uint64_t *f) {
-    uint64_t i, k;
-    uint64_t min, *next;
-    uint64_t nnext = 0;
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-    uint64_t *prev_test;
-    
-    if(test) {
-        min = 0;
-        next = malloc(3*ntest*sizeof(uint64_t));
-        prev_test = test;
-    } else {
-        min = 1;
-        next = malloc(2*sizeof(uint64_t));
-        prev_test = calloc(1, sizeof(uint64_t));
-        ntest = 1;
+typedef struct _ns {
+    int num_solutions;
+    int *solutions;
+} ns_t;
+
+typedef struct _q q_t;
+
+struct _q {
+    int8_t solution[16];
+    int ndig;
+
+    q_t *prev;
+    q_t *next;
+};
+
+void enqueue(q_t **head, q_t **tail, int ndig, int8_t sol[]) {
+    q_t *new = malloc(sizeof(q_t));
+    new->ndig = ndig;
+    memcpy(new->solution, sol, sizeof(new->solution));
+
+    if(*head) {
+        (*head)->prev = new;
     }
 
-    for(k = 0; k < ntest; k++) {
-        uint64_t cur_test = prev_test[k];
+    new->next = *head;
+    new->prev = NULL;
 
-        for(i = min; i < 3; i++) {
-            uint64_t new_test = cur_test * 10ul + i;
-            if(new_test < cur_test) {
-                fprintf(stderr, "OVERFLOW\n");
-                exit(0);
+    *head = new;
+
+    if(!(*tail)) {
+        *tail = *head;
+    }
+}
+
+void dequeue(q_t **head, q_t **tail, int *ndig, int8_t sol[]) {
+    *ndig = (*tail)->ndig;
+    memcpy(sol, (*tail)->solution, sizeof((*tail)->solution));
+
+    if(*head == *tail)
+        *head = NULL;
+
+    q_t *del = *tail;
+    *tail = (*tail)->prev;
+
+    if(*tail)
+        (*tail)->next = NULL;
+    
+    free(del);
+}
+
+ns_t **table;
+
+int test(long item) {
+    while(item) {
+        if((item % 10) >= 3)
+            return false;
+
+        item /= 10;
+    }
+
+    return true;
+}
+
+void init_table(void)
+{
+    // build a table of solutions to:
+    // a + b*x == {0, 1, 2} mod 10, where:
+    // - a could be somewhat big, ~1000 maybe
+    // - b and x are both digits
+    table = malloc(10 * sizeof(ns_t *));
+    int a, b, x;
+    for(a = 0; a < 10; a++) {
+        table[a] = calloc(10, sizeof(ns_t));
+
+        for(b = 0; b < 10; b++) {
+            table[a][b].solutions = malloc(10*sizeof(int));
+            for(x = 0; x < 10; x++) {
+                int item = (a + b*x) % 10;
+                if(test(item))
+                    table[a][b].solutions[table[a][b].num_solutions++] = x;
             }
-            next[nnext++] = new_test;
+        }
+    }
+}
 
-            //printf("testing %ld\n", new_test);
+void unpack(long n, int *ndig, int8_t digits[]) {
+    *ndig = 0;
 
+    while(n) {
+        digits[(*ndig)++] = n % 10;
+        n /= 10;
+    }
+}
 
-            int64_t j;
-            for(j = 1; j <= N; j++) {
-                if(f[j] && f[j] < new_test) {
-                    continue;
+long pack(int ndig, int8_t digits[]) {
+    //printf("packing: ");
+    int i;
+    //for(i = 0; i < ndig; i++)
+        //printf("%d ", digits[i]);
+    //printf("\n");
+    long result = 0;
+
+    for(i = ndig-1; i >= 0; i--) {
+        result *= 10;
+        result += digits[i];
+    }
+
+    //printf("result: %d\n", result);
+
+    return result;
+}
+
+long compute(long n) {
+    //printf("%ld:\n", n);
+    int ndig, sdig;
+    int8_t digits[10];
+    int8_t solution_digits[16];
+
+    unpack(n, &ndig, digits);
+
+    int b = digits[0];
+    ns_t *try = table[0] + b;
+    int i;
+    q_t *head = NULL, *tail = NULL;
+    bool hit = false;
+    long min_hit = 0;
+    long sol;
+    for(i = 0; i < try->num_solutions; i++) {
+        memset(solution_digits, 0, sizeof(solution_digits));
+        if(try->solutions[i] == 0)
+            continue;
+
+        sol = try->solutions[i];
+        if(test(sol*n)) {
+            min_hit = hit ? MIN(min_hit, sol) : sol;
+            hit = true;
+        } else {
+            solution_digits[0] = sol;
+            enqueue(&head, &tail, 1, solution_digits);
+        }
+    }
+
+    // guaranteed to have found smallest solution
+    if(hit)
+        return min_hit;
+
+    while(head) {
+        dequeue(&head, &tail, &sdig, solution_digits);
+
+        printf("dequeue: %ld\n", pack(sdig, solution_digits));
+
+        int a = 0;
+        int j;
+
+        printf("a == ");
+
+        for(j = 0; j < ndig; j++) {
+            int k;
+            for(k = 0; k < sdig; k++) {
+                if(j + k + 1 == sdig) {
+                    printf("(%d * %d)/10 + ", digits[j], solution_digits[k]);
+                    a += (digits[j]*solution_digits[k]) / 10;
                 }
+                if(j + k == sdig) {
+                    printf("(%d * %d)%10 + ", digits[j], solution_digits[k]);
+                    a += (digits[j]*solution_digits[k]) % 10;
+                }
+            }
+        }
 
-                if(!(new_test % j)) {
-                    //printf("f %ld hit for j == %ld\n", new_test, j);
-                    f[j] = new_test;
+        printf("== %ld\n", a);
+        
+        ns_t *try = table[a % 10] + b;
+
+        for(i = 0; i < try->num_solutions; i++) {
+            printf("try %ld / %ld: %ld\n", i+1, try->num_solutions, try->solutions[i]);
+            solution_digits[sdig] = try->solutions[i];
+
+            sol = pack(sdig+1, solution_digits);
+
+            printf("product: %ld\n", sol*n);
+
+            if(test(sol*n)) {
+                if(n == 89) {
+                    printf("found solution %ld => %ld for n == 89 [a == %ld]\n", sol, sol*n, a);
+                }
+                min_hit = hit ? MIN(min_hit, sol) : sol;
+                hit = true;
+            } else {
+                if(!hit) {
+                    printf("enqueue: %ld\n", pack(sdig+1, solution_digits));
+                    enqueue(&head, &tail, sdig+1, solution_digits);
                 }
             }
         }
     }
 
-    free(prev_test);
-
-    int64_t complete_count = 0;
-    for(k = 1; k <= N; k++) {
-        if(f[k])
-            complete_count++;
-    }
-    printf("complete count is %ld\n", complete_count);
-
-    if(complete_count == N)
-        return;
-
-    doit(nnext, next, f);
-
-    return;
+    return min_hit;
 }
 
 int main(void)
 {
-    uint64_t *f = calloc(N+1, sizeof(uint64_t));
-    uint64_t result = 0ul;
+    init_table();
 
-    uint64_t i;
-    bool stop = false;
+    long n;
+    long result = 0;
 
-    while(!stop) {
-        doit(0ul, NULL, f);
-
-        stop = true;
-        for(i = 1; i <= N && stop; i++) {
-            stop &= (f[i] > 0);
-        } 
+    for(n = 1; n <= N; n++) {
+        n = 89;
+        long x = compute(n);
+        printf("%ld * %ld == %ld\n", n, x, n*x);
+        result += x;
+        break;
     }
 
-    for(i = 1; i <= N; i++) {
-        result += f[i] / i;
-    }
-
-    printf("result: %ld\n", result);
+    printf("solution: %ld\n", result);
 
     return 0;
 }
