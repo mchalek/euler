@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define N 300
+#define N 100
 #define MAX_A 100000
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -158,29 +158,21 @@ long compute(long n) {
     while(head) {
         dequeue(&head, &tail, &sdig, solution_digits);
 
+        long psol = pack(sdig, solution_digits);
+
         printf("dequeue: %ld\n", pack(sdig, solution_digits));
 
         int a = 0;
         int j;
 
-        printf("a == ");
-
-        for(j = 0; j < ndig; j++) {
-            int k;
-            for(k = 0; k < sdig; k++) {
-                if(j + k + 1 == sdig) {
-                    printf("(%d * %d)/10 + ", digits[j], solution_digits[k]);
-                    a += (digits[j]*solution_digits[k]) / 10;
-                }
-                if(j + k == sdig) {
-                    printf("(%d * %d)%10 + ", digits[j], solution_digits[k]);
-                    a += (digits[j]*solution_digits[k]) % 10;
-                }
-            }
-        }
-
-        printf("== %ld\n", a);
+        int8_t tmp[20];
+        int z;
+        unpack(psol*n, &z, tmp);
         
+        a = tmp[sdig];
+
+        printf("a == %ld\n", a);
+
         ns_t *try = table[a % 10] + b;
 
         for(i = 0; i < try->num_solutions; i++) {
@@ -217,11 +209,11 @@ int main(void)
     long result = 0;
 
     for(n = 1; n <= N; n++) {
-        n = 89;
+        //n = 89;
         long x = compute(n);
         printf("%ld * %ld == %ld\n", n, x, n*x);
         result += x;
-        break;
+        //break;
     }
 
     printf("solution: %ld\n", result);
