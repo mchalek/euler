@@ -195,7 +195,7 @@ uint64_t compute(uint64_t n) {
             solution_digits[sdig] = try->solutions[i];
 
             int good = mul_and_test(sdig+1, solution_digits, ndig, digits);
-            uint64_t sol = pack(sdig+1, solution_digits);
+            uint64_t sol = pack(sdig+1, solution_digits); // turns out that solution just barely does not overflow
 
             if(good) {
                 min_hit = hit ? MIN(min_hit, sol) : sol;
