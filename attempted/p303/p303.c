@@ -4,8 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define N 100
-#define MAX_A 100000
+#define N 10000
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
@@ -61,7 +60,8 @@ void dequeue(q_t **head, q_t **tail, int *ndig, int8_t sol[]) {
 
 ns_t **table;
 
-int test(long item) {
+
+int test(uint64_t item) {
     while(item) {
         if((item % 10) >= 3)
             return false;
@@ -94,7 +94,7 @@ void init_table(void)
     }
 }
 
-void unpack(long n, int *ndig, int8_t digits[]) {
+void unpack(uint64_t n, int *ndig, int8_t digits[]) {
     *ndig = 0;
 
     while(n) {
@@ -103,26 +103,53 @@ void unpack(long n, int *ndig, int8_t digits[]) {
     }
 }
 
-long pack(int ndig, int8_t digits[]) {
-    //printf("packing: ");
+uint64_t pack(int ndig, int8_t digits[]) {
     int i;
-    //for(i = 0; i < ndig; i++)
-        //printf("%d ", digits[i]);
-    //printf("\n");
-    long result = 0;
+    uint64_t result = 0;
 
     for(i = ndig-1; i >= 0; i--) {
         result *= 10;
         result += digits[i];
     }
 
-    //printf("result: %d\n", result);
-
     return result;
 }
 
-long compute(long n) {
-    //printf("%ld:\n", n);
+void mul(int n0, int8_t i0[], int n1, int8_t i1[], int8_t i2[])
+{
+    int tmp[64];
+    memset(tmp, 0, sizeof(tmp));
+    memset(i2, 0, 64*sizeof(int8_t));
+    int i, j; 
+    for(i = 0; i < n0; i++) {
+        for(j = 0; j < n1; j++) {
+            tmp[i + j] += i0[i]*i1[j];
+        }
+    }
+
+    for(i = 0; i < 63; i++) {
+        tmp[i+1] += tmp[i] / 10;
+        tmp[i] %= 10;
+
+        i2[i] = tmp[i];
+    }
+}
+
+int mul_and_test(int n0, int8_t i0[], int8_t n1, int8_t i1[])
+{
+    int8_t result[64];
+    mul(n0, i0, n1, i1, result);
+
+    int i;
+    for(i = 0; i < 64; i++)
+        if(result[i] > 2)
+            return 0;
+    
+    return 1;
+}
+
+
+uint64_t compute(uint64_t n) {
     int ndig, sdig;
     int8_t digits[10];
     int8_t solution_digits[16];
@@ -134,14 +161,13 @@ long compute(long n) {
     int i;
     q_t *head = NULL, *tail = NULL;
     bool hit = false;
-    long min_hit = 0;
-    long sol;
+    uint64_t min_hit = 0;
     for(i = 0; i < try->num_solutions; i++) {
         memset(solution_digits, 0, sizeof(solution_digits));
         if(try->solutions[i] == 0)
             continue;
 
-        sol = try->solutions[i];
+        uint64_t sol = try->solutions[i];
         if(test(sol*n)) {
             min_hit = hit ? MIN(min_hit, sol) : sol;
             hit = true;
@@ -151,49 +177,32 @@ long compute(long n) {
         }
     }
 
-    // guaranteed to have found smallest solution
+    // guaranteed to have found smallest solution, if any solution found
     if(hit)
         return min_hit;
 
     while(head) {
         dequeue(&head, &tail, &sdig, solution_digits);
 
-        long psol = pack(sdig, solution_digits);
-
-        printf("dequeue: %ld\n", pack(sdig, solution_digits));
-
-        int a = 0;
-        int j;
-
-        int8_t tmp[20];
-        int z;
-        unpack(psol*n, &z, tmp);
+        int8_t tmp[64];
+        mul(sdig, solution_digits, ndig, digits, tmp);
         
-        a = tmp[sdig];
-
-        printf("a == %ld\n", a);
+        int a = tmp[sdig];
 
         ns_t *try = table[a % 10] + b;
 
         for(i = 0; i < try->num_solutions; i++) {
-            printf("try %ld / %ld: %ld\n", i+1, try->num_solutions, try->solutions[i]);
             solution_digits[sdig] = try->solutions[i];
 
-            sol = pack(sdig+1, solution_digits);
+            int good = mul_and_test(sdig+1, solution_digits, ndig, digits);
+            uint64_t sol = pack(sdig+1, solution_digits);
 
-            printf("product: %ld\n", sol*n);
-
-            if(test(sol*n)) {
-                if(n == 89) {
-                    printf("found solution %ld => %ld for n == 89 [a == %ld]\n", sol, sol*n, a);
-                }
+            if(good) {
                 min_hit = hit ? MIN(min_hit, sol) : sol;
                 hit = true;
             } else {
-                if(!hit) {
-                    printf("enqueue: %ld\n", pack(sdig+1, solution_digits));
+                if(!hit)
                     enqueue(&head, &tail, sdig+1, solution_digits);
-                }
             }
         }
     }
@@ -205,15 +214,13 @@ int main(void)
 {
     init_table();
 
-    long n;
-    long result = 0;
+    uint64_t n;
+    uint64_t result = 0;
 
     for(n = 1; n <= N; n++) {
-        //n = 89;
-        long x = compute(n);
+        uint64_t x = compute(n);
         printf("%ld * %ld == %ld\n", n, x, n*x);
         result += x;
-        //break;
     }
 
     printf("solution: %ld\n", result);
