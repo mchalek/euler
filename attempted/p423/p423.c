@@ -3,30 +3,42 @@
 #include <prime.h>
 #include <string.h>
 
-#define N 50
-#define MODULUS 1000000007
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
+#define N 50l
+#define MODULUS 10000000000000000007ul
+//#define MODULUS 1000000007ul
+
+#define VERBOSE
 
 int main()
 {
     long *p;
     long np;
-    primes(N, &np, &p);
+    primes(N, &p, &np);
+
+    printf("np: %ld == Pi(%ld)\n", np, N);
 
     int pi = 0;
 
     int64_t i;
-    uint32_t *scores = calloc(N+1, sizeof(uint32_t *));
-    uint32_t *tmp = malloc((N+1)*sizeof(uint32_t *));
+    uint64_t *scores = calloc(N+1, sizeof(uint64_t *));
+    uint64_t *tmp = malloc((N+1)*sizeof(uint64_t *));
 
     scores[0] = 1;
-    for(i = 1; i <= N; i++) {
-        memset(tmp, 0, (N+1)*sizeof(uint32_t));
-        int64_t j; // j is score
-        for(j = 0; j <= i; j++) {
-            if(j)
-                tmp[j] += scores[j-1];
 
-            tmp[j] += (5ul*scores[j] % MODULUS);
+    uint64_t S = 6ul; // C(1) == 6
+    printf("C(1) == 6, S(1) == 6\n");
+    for(i = 2; i <= N; i++) {
+        memset(tmp, 0, (N+1)*sizeof(uint64_t));
+        int64_t j; // j is score
+
+        tmp[0] += 5ul*scores[0];
+        tmp[0] %= MODULUS;
+        for(j = 1; j <= MIN(i, np); j++) {
+            tmp[j] += scores[j-1];
+
+            tmp[j] += 5ul*scores[j];
             tmp[j] %= MODULUS;
         }
 
@@ -34,18 +46,24 @@ int main()
         scores = tmp;
         tmp = tmp2;
 
-        if(primes[pi] == i) {
+        if(p[pi] == i) {
             pi++;
         }
 
         uint64_t C = 0;
         for(j = 0; j <= pi; j++) {
-            C += (6ul*scores[j] % MODULUS);
+            C += 6ul*scores[j];
             C %= MODULUS;
         }
 
-        printf("C(%ld) == %ld\n", i, C);
+        S += C;
+#ifdef VERBOSE
+        printf("C(%ld) == %ld, S(%ld) == %ld\n", i, C, i, S);
+#endif
+        S %= MODULUS;
     }
+
+    printf("S(%ld) == %ld\n", N, S);
 
     return 0;
 }
