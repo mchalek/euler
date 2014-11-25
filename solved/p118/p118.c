@@ -48,9 +48,8 @@ int main(void)
 
     uint64_t counts[512];
     memset(counts, 0, sizeof(counts));
+    // no pandigital primes, i checked already
     primes(100000000, &p, &np);
-    printf("found primes.  now checking.\n");
-    fflush(stdout);
 
     long i;
     for(i = 0; i < np; i++) {
