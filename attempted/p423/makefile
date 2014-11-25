@@ -1,2 +1,4 @@
-all: 
-	$(CC) p423.c -o p423 -g -O3
+CFLAGS=-I../../libs/primes/ -Wall -Wextra -O3 -g
+LDLIBS=-L../../libs/primes/ -lprime
+all: p423
+	
