@@ -5,9 +5,9 @@
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-#define N 50l
-#define MODULUS 10000000000000000007ul
-//#define MODULUS 1000000007ul
+#define N 50000l
+//#define MODULUS 10000000000000000007ul
+#define MODULUS 1000000007ul
 
 #define VERBOSE
 
@@ -30,7 +30,7 @@ int main()
     uint64_t S = 6ul; // C(1) == 6
     printf("C(1) == 6, S(1) == 6\n");
     for(i = 2; i <= N; i++) {
-        memset(tmp, 0, (N+1)*sizeof(uint64_t));
+        memset(tmp, 0, (MIN(i, np)+1)*sizeof(uint64_t));
         int64_t j; // j is score
 
         tmp[0] += 5ul*scores[0];
