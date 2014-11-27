@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 {
     int nsteps;
     if(argc < 2) {
-        nsteps = 1000;
+        nsteps = 100000;
     } else {
         nsteps = atoi(argv[1]);
     }
@@ -18,7 +18,6 @@ int main(int argc, char **argv)
     p[50] = 1.0;
 
     double result = 0.0;
-    double delta_p;
 
     int i;
     for(i = 0; i < nsteps; i++) {
@@ -26,8 +25,6 @@ int main(int argc, char **argv)
         memcpy(q, p, sizeof(q));
         memset(p, 0, sizeof(p));
 
-        // p[0] just gets copied over
-        p[0] = q[0];
         for(j = 1; j < 51; j++) {
             // first handle the case where the two dice move
             // toward each other, i.e. in the direction that reduces
@@ -79,12 +76,10 @@ int main(int argc, char **argv)
         for(j = 0; j < 51; j++)
             sum += p[j];
 
-        delta_p = p[0] - q[0];
-        printf("p[0][%d] == %g; sum[p] == %g\n", i, p[0], sum);
-        //printf("p[50][%d] == %g\n", i, p[50]);
-        result += i*delta_p;
+        double delta_p = p[0];
+        result += (1+i)*delta_p;
     }
 
-    printf("result: %.10f\n", result);
+    printf("result: %.10lf\n", result);
     return 0;
 }
