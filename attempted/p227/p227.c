@@ -11,49 +11,80 @@ int main(int argc, char **argv)
         nsteps = atoi(argv[1]);
     }
 
-    double p[100][100];
-    double q[100][100];
+    double p[51];
+    double q[51];
     memset(p, 0, sizeof(p));
 
-    p[0][50] = 1.0;
+    p[50] = 1.0;
 
     double result = 0.0;
+    double delta_p;
 
     int i;
     for(i = 0; i < nsteps; i++) {
-        int j, k;
+        int j;
         memcpy(q, p, sizeof(q));
         memset(p, 0, sizeof(p));
-        // duh, update distance instead of pairwise positions
-        for(j = 0; j < 100; j++) {
-            // j is position of die 0
-            int jleft = (100 + j - 1) % 100;
-            int jright = (j + 1) % 100;
-            for(k = 0; k < 100; k++) {
-                // k is position of die 1
-                int kleft = (100 + k - 1) % 100;
-                int kright = (k + 1) % 100;
 
-                p[jleft][kleft] += q[j][k] / 36.0;
-                p[jleft][k] += q[j][k] / 9.0;
-                p[jleft][kright] += q[j][k] / 36.0;
+        // p[0] just gets copied over
+        p[0] = q[0];
+        for(j = 1; j < 51; j++) {
+            // first handle the case where the two dice move
+            // toward each other, i.e. in the direction that reduces
+            // distance
+            double x = q[j] / 36.0; // * (1/6 * 1/6);
+            if(j == 1) {
+                // if j == 1, then the two dice swap positions,
+                // so distance stays the same
+                p[1] += x;
+            } else {
+                // otherwise distance goes down by 2
+                p[j-2] += x;
+            } 
 
-                p[j][kleft] += q[j][k] / 9.0;
-                p[j][k] += q[j][k] * 4.0 / 9.0;
-                p[j][kright] += q[j][k] / 9.0;
+            // next do the case where 1 die stays in place, the other
+            // moves toward it.  There are 2 ways this can happen,
+            // since there are 2 die
+            x = q[j] * 2.0 / 9.0; // * 2 * (4/6 * 1/6);
+            p[j-1] += x;
 
-                p[jright][kleft] += q[j][k] / 36.0;
-                p[jright][k] += q[j][k] / 9.0;
-                p[jright][kright] += q[j][k] / 36.0;
+            // now the case where distance remains the same.  This can either
+            // happen by both dies not moving, or by both of them moving
+            // in the same direction.  This latter case has 2 possibilities,
+            // because there are 2 directions
+            x = q[j] / 2.0; // * (4/6 * 4/6 + 2 * 1/6 * 1/6);
+            p[j] += x;
+
+            // final cases: 
+            // 1) 1 die stays in place and the other moves away from it,
+            //    increasing distance by 1
+            // 2) 2 dies move away from each other, increasing distance
+            //    by 2
+            x = q[j] * 2.0 / 9.0; // * 2 * (4/6 * 1/6);
+            double y = q[j] / 36.0; // * (1/6 * 1/6);
+
+            if(j == 49) {
+                p[50] += x;
+                p[49] += y;
+            } else if(j == 50) {
+                p[49] += x;
+                p[48] += y;
+            } else {
+                p[j+1] += x;
+                p[j+2] += y;
             }
         }
 
-        for(j = 0; j < 100; j++) {
-            result += i*p[j][j];
-            p[j][j] = 0.0;
-        }
+        double sum = 0.0;
+        for(j = 0; j < 51; j++)
+            sum += p[j];
+
+        delta_p = p[0] - q[0];
+        printf("p[0][%d] == %g; sum[p] == %g\n", i, p[0], sum);
+        //printf("p[50][%d] == %g\n", i, p[50]);
+        result += i*delta_p;
     }
 
-    printf("result: %g\n", result);
+    printf("result: %.10f\n", result);
     return 0;
 }
