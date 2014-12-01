@@ -12,7 +12,7 @@ long cube(long x, long m)
 }
 
 #define MAX_P 1865706l
-#define MAX_X (MAX_P/2)
+#define MAX_X 16000
 
 int main()
 {

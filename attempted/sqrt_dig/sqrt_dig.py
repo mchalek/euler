@@ -26,7 +26,7 @@ def sdig(n):
 
     return digits
 
-max_n = 1000
+max_n = 100
 
 squares = set([n*n for n in range(2, 1+max_n)])
 sums = [(n, sum(sdig(n))) for n in range(2, 1+max_n) if n not in squares]
