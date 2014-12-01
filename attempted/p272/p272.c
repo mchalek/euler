@@ -11,8 +11,8 @@ long cube(long x, long m)
     return x3 % m;
 }
 
-#define MAX_X 15156
 #define MAX_P 1865706l
+#define MAX_X (MAX_P/2)
 
 int main()
 {
