@@ -26,7 +26,7 @@ double p(int k) {
     if(k == 1) {
         A0 = 0.0;
         theta0 = M_PI/4;
-        A1 = (theta0 - theta1)*r1_2 + 1/tan(theta0) - 1/tan(theta1);
+        A1 = (theta0 - theta1)*r1_2 + 1 - sqrt(r1_2 - 1);
     }
 
     return (A0 + A1) / (dk*dk);
