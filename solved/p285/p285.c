@@ -3,6 +3,13 @@
 
 #define N 100000
 
+// find the area of annular region via polar integral
+// difficulty only appears due to incompatible symmetry at the xy axes.
+// let the angles theta1 and theta0 be the angles at which the boundaries of
+// the annulus hit the x axis.  Then for theta1 < theta < theta0, the
+// integration radius is bounded above by (k+0.5)^2 and below by 1/sin(theta).
+// This integrates cleanly and we're left just doing the computation.
+
 double p(int k) {
     double dk = k;
     double r0 = k - 0.5;
