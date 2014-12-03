@@ -39,8 +39,10 @@ int main()
     double Es = 0;
     for(k = 1; k <= N; k++) {
         Es += k*p(k);
-        printf("p(%g) == %g; Es[%g] == %g\n", (double) k, p(k), (double) k, Es);
+        //printf("p(%g) == %g; Es[%g] == %g\n", (double) k, p(k), (double) k, Es);
     }
 
     printf("expected score: %.5f\n", Es);
+
+    return 0;
 }
