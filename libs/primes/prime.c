@@ -14,28 +14,15 @@ bool isprime(long x, long *p, long np)
     }
 
     long i = 0;
-    if(x > p[np-1]) {
-        while(x) {
-            // could be faster, can stop if x < p[np-1] but this requires a second check
-            while(0 == (x % p[i]))
-                x /= p[i];
+    for(i = 0; i < np; i++) {
+        if(p[i] >= x)
+            break;
 
-            i++;
-
-            if(i == np)
-                break;
-        }
-
-        return x != 1;
-    } else {
-        // should binary search but this is the inexpensive case
-        for(i = 0; i < np; i++) {
-            if(p[i] == x)
-                return true;
-        }
+        if(0 == (x % p[i]))
+            return false;
     }
 
-    return false;
+    return true;
 }
 
 void primes(long N, long **p, long *k)
