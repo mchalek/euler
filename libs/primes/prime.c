@@ -1,5 +1,42 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "prime.h"
+
+bool isprime(long x, long *p, long np)
+{
+    if(np < 1) {
+        fprintf(stderr, "ERROR: no primes!\n");
+        exit(-1);
+    }
+    if(x > p[np-1]*p[np-1]) {
+        fprintf(stderr, "ERROR: %ld is beyond the maximum testable for primes up to %ld\n", x, p[np-1]);
+        exit(-1);
+    }
+
+    long i = 0;
+    if(x > p[np-1]) {
+        while(x) {
+            // could be faster, can stop if x < p[np-1] but this requires a second check
+            while(0 == (x % p[i]))
+                x /= p[i];
+
+            i++;
+
+            if(i == np)
+                break;
+        }
+
+        return x != 1;
+    } else {
+        // should binary search but this is the inexpensive case
+        for(i = 0; i < np; i++) {
+            if(p[i] == x)
+                return true;
+        }
+    }
+
+    return false;
+}
 
 void primes(long N, long **p, long *k)
     // simple prime sieve

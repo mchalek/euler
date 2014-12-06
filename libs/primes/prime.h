@@ -1,7 +1,11 @@
 #ifndef __PRIME_H
 #define __PRIME_H
 
+#include <stdbool.h>
+
 void primes(long N, long **p, long *k);
+
+bool isprime(long x, long *p, long np);
 
 long nlogi(long n, long i);
 long ipow(long x, long y);
