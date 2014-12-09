@@ -7,7 +7,7 @@
 
 int main(void)
 {
-    int i, j, k, *p;
+    long i, j, k, *p;
     int **table;
     int *ntable;
     long tmp;
