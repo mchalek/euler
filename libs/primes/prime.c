@@ -54,8 +54,14 @@ static inline void setcmp(long x, uint64_t *cmp)
 void primes(long N, long **p, long *k_out)
     // simple prime sieve
 {
-   long i, j;
-   long nword = (N + 127) / 128;
+   if(N < 2) {
+       fprintf(stderr, "ERROR: no primes < 2!!\n");
+       exit(-1);
+   }
+
+   uint64_t i, j;
+   uint64_t uiN = (uint64_t) N; // we know conversion is okay because N >= 2
+   uint64_t nword = (uiN + 127) / 128;
    uint64_t *cmp = aligned_alloc(16, nword * sizeof(uint64_t));
    memset(cmp, 0, nword * sizeof(uint64_t));
 
@@ -64,16 +70,21 @@ void primes(long N, long **p, long *k_out)
    long k = 0;
 
    (*p)[k++] = 2;
-   
-   for(i = 3; i < N; i += 2) {
+
+   for(i = 3; i < uiN; i += 2) {
        if(!iscmp(i, cmp)) {
            if(k == nalloc) {
                nalloc <<= 1;
                *p = realloc(*p, nalloc*sizeof(long));
            }
            (*p)[k++] = i;
+           
+           // check for i^2 overflow
+           // not a problem because we're assured N fits in 64 bits
+           if(i > ((1ul << 32) - 1))
+               continue;
 
-           for(j = i*i; j < N; j += 2*i) {
+           for(j = i*i; j < uiN; j += 2*i) {
                setcmp(j, cmp);
            }
        }
