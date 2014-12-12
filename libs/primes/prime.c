@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdio.h>
 #include "prime.h"
@@ -28,8 +29,8 @@ bool isprime(long x, long *p, long np)
 
 static inline void cmpidx(long x, long *idx, uint64_t *mask)
 {
-    *idx = x / 64;
-    *mask = 1ul << (x % 64);
+    *idx = x / 128;
+    *mask = 1ul << ((x % 128) >> 1);
 }
 
 static inline bool iscmp(long x, uint64_t *cmp)
@@ -54,20 +55,25 @@ void primes(long N, long **p, long *k_out)
     // simple prime sieve
 {
    long i, j;
-   uint64_t *cmp = aligned_alloc(16, ((N + 63) / 64) * sizeof(uint64_t));
+   long nword = (N + 127) / 128;
+   uint64_t *cmp = aligned_alloc(16, nword * sizeof(uint64_t));
+   memset(cmp, 0, nword * sizeof(uint64_t));
 
    long nalloc = 1024;
    *p = malloc(nalloc*sizeof(long));
    long k = 0;
+
+   (*p)[k++] = 2;
    
-   for(i = 2; i < N; i++) {
+   for(i = 3; i < N; i += 2) {
        if(!iscmp(i, cmp)) {
            if(k == nalloc) {
                nalloc <<= 1;
                *p = realloc(*p, nalloc*sizeof(long));
            }
            (*p)[k++] = i;
-           for(j = i; j < N; j += i) {
+
+           for(j = i*i; j < N; j += 2*i) {
                setcmp(j, cmp);
            }
        }

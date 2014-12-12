@@ -1,4 +1,5 @@
 #include <prime.h>
+#include <stdio.h>
 
 int main(void)
 {
@@ -8,6 +9,8 @@ int main(void)
 
     int i;
     for(i = 0; i < np; i++) {
-        printf("%d is prime\n", p[i]);
+        printf("%ld is prime\n", p[i]);
     }
+
+    return 0;
 }
