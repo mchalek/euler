@@ -77,7 +77,7 @@ void primes(long N, long **p, long *k_out)
                nalloc <<= 1;
                *p = realloc(*p, nalloc*sizeof(long));
            }
-           (*p)[k++] = i;
+           (*p)[k++] = (long) i;
            
            // check for i^2 overflow
            // not a problem because we're assured N fits in 64 bits
