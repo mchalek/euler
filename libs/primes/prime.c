@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include "prime.h"
 
@@ -25,27 +26,56 @@ bool isprime(long x, long *p, long np)
     return true;
 }
 
-void primes(long N, long **p, long *k)
+static inline void cmpidx(long x, long *idx, uint64_t *mask)
+{
+    *idx = x / 64;
+    *mask = 1ul << (x % 64);
+}
+
+static inline bool iscmp(long x, uint64_t *cmp)
+{
+    long idx;
+    uint64_t mask;
+    cmpidx(x, &idx, &mask);
+
+    return cmp[idx] & mask;
+}
+
+static inline void setcmp(long x, uint64_t *cmp)
+{
+    long idx;
+    uint64_t mask;
+    cmpidx(x, &idx, &mask);
+
+    cmp[idx] |= mask;
+}
+
+void primes(long N, long **p, long *k_out)
     // simple prime sieve
 {
    long i, j;
-   char *iscmp = calloc(N, sizeof(char)); 
-   iscmp[0] = 1;
+   uint64_t *cmp = aligned_alloc(16, ((N + 63) / 64) * sizeof(uint64_t));
 
-   *p = malloc(N*sizeof(long));
-   *k = 0;
+   long nalloc = 1024;
+   *p = malloc(nalloc*sizeof(long));
+   long k = 0;
    
    for(i = 2; i < N; i++) {
-       if(!iscmp[i]) {
-           (*p)[(*k)++] = i;
-           for(j = i; j < N; j+= i) {
-               iscmp[j] = 1;
+       if(!iscmp(i, cmp)) {
+           if(k == nalloc) {
+               nalloc <<= 1;
+               *p = realloc(*p, nalloc*sizeof(long));
+           }
+           (*p)[k++] = i;
+           for(j = i; j < N; j += i) {
+               setcmp(j, cmp);
            }
        }
    }
 
-   *p = realloc(*p, (*k) * sizeof(long));
-   free(iscmp);
+   free(cmp);
+   *p = realloc(*p, k * sizeof(long));
+   *k_out = k;
 }
 
 long nlogi(long n, long i) {
