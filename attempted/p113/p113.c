@@ -17,7 +17,7 @@ int main()
     decr[0] = 0;
 
     long result = 9; // all single digits are valid
-    for(i = 1; i < 10; i++) {
+    for(i = 1; i < 100; i++) {
         long next_incr[10];
         long next_decr[10];
 
@@ -41,10 +41,11 @@ int main()
         for(j = 0; j < 10; j++) {
             result += incr[j] + decr[j];
         }
+
+        result -= 9; // remove numbers that are both bouncy and non-bouncy, i.e.
+                     // numbers that are all the same digit
     }
 
-    result -= 9; // remove numbers that are both bouncy and non-bouncy, i.e.
-                 // numbers that are all the same digit
 
     printf("result: %ld\n", result);
 
