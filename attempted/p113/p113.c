@@ -7,7 +7,7 @@ int main()
 
     int i, j;
 
-    for(i = 0; i < 10; i++) {
+    for(i = 1; i < 10; i++) {
         incr[i] = 1;
         decr[i] = 1;
     }
@@ -15,7 +15,7 @@ int main()
     incr[0] = 0;
     decr[0] = 0;
 
-    for(i = 1; i < 99; i++) {
+    for(i = 1; i < 6; i++) {
         long next_incr[10];
         long next_decr[10];
 
@@ -24,7 +24,7 @@ int main()
             next_incr[j] = incr[j] + incr[j-1];
 
         next_decr[9] = decr[9];
-        for(j = 8; j >= 0; j++)
+        for(j = 8; j >= 0; j--)
             next_decr[j] = decr[j] + decr[j+1];
 
         memcpy(incr, next_incr, sizeof(incr));
