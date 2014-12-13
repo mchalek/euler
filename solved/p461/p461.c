@@ -83,7 +83,7 @@ int main()
     }
 
     double min_dist = 20.0;
-    int abcd[4];
+    int abcd[4] = {0, 0, 0, 0};
 
     for(i = 0; i < n_pairs; i++) {
         double remainder = TARGET - pairs[i].fafb;
