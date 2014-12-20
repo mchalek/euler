@@ -25,8 +25,8 @@ int main()
     uint64_t i;
 
     for(i = 2; i < MAX_P; i++) {
-        if(!(i % 1000))
-            printf("doing i == %ld\n", i);
+        //if(!(i % 1000))
+        //    printf("doing i == %ld\n", i);
         uint64_t test = i*i + i + 1;
         long nf;
         long pfactors[20];
@@ -48,8 +48,14 @@ int main()
             count++;
     }
 
+    // now recursively build up all numbers with C(n) == 243 by:
+    //  - pre-compute a list of valid increments that do not include any of the
+    //    3CRU primes
+    //  - compute all numbers with 5 distinct 3CRU prime factors, including
+    //    repeated factors
+    //  - for each of those numbers, iterate over increments until exceeding
+    //    10^11
     printf("%d primes below %d have 3 cubed roots of unity\n", count, MAX_P);
-
 
     return 0;
 }
