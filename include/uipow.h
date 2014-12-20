@@ -13,6 +13,9 @@ static inline uint64_t uipow(uint64_t a, uint64_t b, uint64_t modulus)
     if(a == 1 || b == 0)
         return 1ul;
 
+    if(b == 1)
+        return a % modulus;
+
     if((a % modulus) >= (1ul << 32)) {
         fprintf(stderr, "ERROR: %ld %% %ld is too large, cannot exponentiate!\n",
                 a, modulus);
@@ -26,23 +29,26 @@ static inline uint64_t uipow(uint64_t a, uint64_t b, uint64_t modulus)
     uint64_t result = a;
     int pow = 0;
 
-    while((1l << pow) < b) {
-        powers_of_2[pow] = result;
-        pow++;
+    uint64_t exp = 1ul;
+    do {
+        powers_of_2[pow++] = result;
         result *= result;
         result %= modulus;
-    }
+        exp <<= 1;
+    } while(exp < b);
 
     uint64_t ret = 1;
     pow--;
+    exp = 1l << pow;
     for( ; b ; pow--) {
         int i;
-        uint64_t exp = 1l << pow;
-        for(i = 0; i < (b / exp); i++) {
+        int n = b / exp;
+        for(i = 0; i < n; i++) {
             ret *= powers_of_2[pow];
             ret %= modulus;
         }
         b %= exp;
+        exp >>= 1;
     }
 
     return ret;
