@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
+// assemble all valid count vectors, for each possible distinct color count,
+// using binomial coefficients to account for the number of ways in which
+// each count vector can exist
+
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
