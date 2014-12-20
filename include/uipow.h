@@ -39,7 +39,7 @@ static inline uint64_t uipow(uint64_t a, uint64_t b, uint64_t modulus)
 
     uint64_t ret = 1;
     pow--;
-    exp = 1l << pow;
+    exp = 1ul << pow;
     for( ; b ; pow--) {
         int i;
         int n = b / exp;
