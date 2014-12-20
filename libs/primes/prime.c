@@ -137,11 +137,13 @@ void factor(
 
         if(!(x % p)) {
             int ind = (*nfactors)++;
-            long exponent = nlogi(x, p);
-
             pfactors[ind] = p;
-            exponents[ind] = exponent;
-            x /= ipow(p, exponent);
+            exponents[ind] = 1;
+            x /= p;
+            while(!(x % p)) {
+                exponents[ind]++;
+                x /= p;
+            }
         }
     }
 
