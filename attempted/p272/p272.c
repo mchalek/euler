@@ -36,6 +36,7 @@ int main()
         int j;
         for(j = 0; j < nf; j++) {
             if(pfactors[j] > (long) i && pfactors[j] <= (long) MAX_P) {
+                //printf("%ld^3 == 1 mod %ld\n", i, pfactors[j]);
                 num_roots[pfactors[j]]++;
             }
         }
