@@ -4,20 +4,32 @@
 #include <stdio.h>
 #include "prime.h"
 
+int lcmp(const void *va, const void *vb)
+{
+    long a = *((long *) va);
+    long b = *((long *) vb);
+
+    return (a == b) ? 0 : (2 * (a > b) - 1);
+}
+
 bool isprime(long x, long *p, long np)
 {
     if(np < 1) {
         fprintf(stderr, "ERROR: no primes!\n");
         exit(-1);
     }
+
     if(x > p[np-1]*p[np-1]) {
         fprintf(stderr, "ERROR: %ld is beyond the maximum testable for primes up to %ld\n", x, p[np-1]);
         exit(-1);
     }
 
+    if(x <= p[np-1])
+        return NULL != bsearch(&x, p, np, sizeof(long), lcmp);
+
     long i = 0;
     for(i = 0; i < np; i++) {
-        if(p[i] >= x)
+        if(p[i]*p[i] >= x)
             break;
 
         if(0 == (x % p[i]))
