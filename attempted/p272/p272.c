@@ -12,6 +12,39 @@
 //#define MAX_P 1865706ul
 //#define MAX_P 2000000ul
 
+
+void brute(int num_roots[], long *p, long np)
+{
+    long i;
+    long sum = 0, n = 0;
+    for(i = 2; i <= MAX_N; i++) {
+        long nf;
+        long pfactors[20];
+        long exponents[20];
+
+        factor(i, p, np, &nf, pfactors, exponents);
+
+        int j;
+        long count = 1;
+        if(nf < 5)
+            continue;
+        for(j = 0; j < nf; j++) {
+            if(pfactors[j] > MAX_P)
+                continue;
+            long this_prime = 1 + num_roots[pfactors[j]];
+
+            count *= this_prime;
+        }
+
+        if(count == 243) {
+            sum += i;
+            n++;
+        }
+    }
+
+    printf("via brute force: %ld items, sum to %ld\n", n, sum);
+}
+
 long ns = 0;
 
 long count(long init, bool bad_increments[])
@@ -25,7 +58,7 @@ long count(long init, bool bad_increments[])
         //if(value < 1000000000) {
             //printf("Hit on %ld!\n", value);
         //}
-        printf("%ld\n", value);
+        //printf("%ld\n", value);
 
         incr++;
         value += init;
@@ -122,6 +155,8 @@ int main()
             }
         }
     }
+
+    brute(num_roots, p, np);
 
     // now recursively build up all numbers with C(n) == 243 by:
     //  - pre-compute a list of valid increments that do not include any of the
