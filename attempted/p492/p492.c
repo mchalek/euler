@@ -11,7 +11,7 @@
 #define Z 1000000000000000l
 //#define Z 1000l
 
-#define NTHREADS 4
+#define NTHREADS 3
 #define WORK_SIZE (((X + Y + 63) / 64) * sizeof(uint64_t))
 
 #define NEXT(a) (6*(a)*(a) + 10*(a) + 3) // == (3a + 3)(2a + 1) + a
