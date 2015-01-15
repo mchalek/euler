@@ -1,5 +1,5 @@
 CFLAGS=-O3 -Wall -Wextra -g -I../../libs/primes/
-LDLIBS=-L../../libs/primes/ -lprime
+LDLIBS=-L../../libs/primes/ -lprime -lpthread
 all: p492
 
 clean:
