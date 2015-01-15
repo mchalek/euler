@@ -7,7 +7,7 @@
 #include <pthread.h>
 
 #define X 1000000000l
-#define Y 1000l
+#define Y 10000000l
 #define Z 1000000000000000l
 //#define Z 1000l
 
