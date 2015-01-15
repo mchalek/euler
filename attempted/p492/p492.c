@@ -2,23 +2,36 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #define X 1000000000l
 #define Y 1000l
 #define Z 1000000000000000l
 //#define Z 1000l
 
+#define WORK_SIZE (((X + Y + 63) / 64) * sizeof(uint64_t))
+
 #define NEXT(a) (6*(a)*(a) + 10*(a) + 3) // == (3a + 3)(2a + 1) + a
 
-long B(long p, char *work) {
-    memset(work, 0, p*sizeof(char));
+bool check_and_update(long idx, uint64_t *work) {
+    uint64_t word = idx / 64;
+    uint64_t bit = 1ul << (idx % 64);
+
+    bool ret = work[word] & bit;
+
+    work[word] |= bit;
+
+    return ret;
+}
+
+long B(long p, uint64_t *work) {
+    memset(work, 0, WORK_SIZE);
 
     long a = 1;
     long i = 0;
 
-    while(!work[a]) {
+    while(!check_and_update(a, work)) {
         i++;
-        work[a] = true;
         a = NEXT(a) % p;
     }
 
@@ -51,26 +64,21 @@ int main()
     long *p, np;
     primes(100000, &p, &np);
 
-    long n_target = 0;
-    long *tp = malloc((Y+1)*sizeof(long));
-
     long i;
-    char *work = calloc(X+Y, sizeof(char));
+    uint64_t *work = malloc(WORK_SIZE);
     long result = 0;
     for(i = X; i <= X+Y; i++) {
         if(isprime(i, p, np)) {
             printf("%ld is prime\n", i);
-            result += B(i, work);
-            tp[n_target++] = i;
+            long Bi = B(i, work);
+            result += Bi;
         } else {
             //printf("%ld is not prime\n", i);
         }
     }
-    printf("%ld target primes\n", n_target);
     printf("B(%ld, %ld, %ld) == %ld\n", X, Y, Z, result);
 
     free(p);
 
     return 0;
-
 }
