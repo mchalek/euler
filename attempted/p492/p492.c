@@ -16,6 +16,8 @@
 
 #define NEXT(a) (6*(a)*(a) + 10*(a) + 3) // == (3a + 3)(2a + 1) + a
 
+#define LOGFILE "results.log"
+
 typedef struct _tasks {
     long *items;
     long num_items;
@@ -41,7 +43,6 @@ typedef struct _result {
 } result_t;
 
 typedef struct _results {
-    FILE *fp;
     result_t *items;
     int num_items;
     pthread_mutex_t mutex;
@@ -56,6 +57,9 @@ void update(results_t *results, long p, long Bp)
     r.Bp = Bp;
 
     pthread_mutex_lock(&results->mutex);
+    FILE *fp = fopen(LOGFILE, "a");
+    fprintf(fp, "%ld\t%ld\n", p, Bp);
+    fclose(fp);
     sum += Bp;
     pthread_mutex_unlock(&results->mutex);
 }
@@ -137,6 +141,28 @@ int main()
 
     long i;
 
+    FILE *fp = fopen(LOGFILE, "r");
+    uint64_t *hits = calloc((X + Y + 63) / 64, sizeof(uint64_t));
+    if(fp) {
+        printf("logfile found.\n");
+        char buf[1024];
+        while(NULL != fgets(buf, sizeof(buf), fp)) {
+            char *tok;
+
+            tok = strtok(buf, "\t");
+            long p = strtol(tok, NULL, 10);
+            
+            tok = strtok(NULL, "\t");
+            long Bp = strtol(tok, NULL, 10);
+            sum += Bp;
+
+            check_and_update(p, hits);
+        }
+        fclose(fp);
+        fp = NULL;
+    } else
+        printf("no logfile found\n");
+
     long nt = 0;
     for(i = X; i <= X + Y; i++) {
         if(isprime(i, p, np))
@@ -147,9 +173,13 @@ int main()
     tasks.num_items = 0;
     tasks.items = malloc(nt*sizeof(long));
     for(i = X; i <= X + Y; i++) {
-        if(isprime(i, p, np))
+        if(isprime(i, p, np) && !check_and_update(i, hits))
             tasks.items[tasks.num_items++] = i;
     }
+    free(hits);
+
+    printf("%ld / %ld tasks remaining, queued.\n", tasks.num_items, nt);
+
     tasks.next_item = 0;
     pthread_mutex_init(&tasks.mutex, NULL);
 
