@@ -166,6 +166,19 @@ void factor(
     }
 }
 
+void merge_factors(long nf0, long factors0[], long exponents0[],
+        long nf1, long factors1[], long exponents1[],
+        long *nf2_out, long factors2[], long exponents2[])
+{
+    // this is a wasteful algorithm but it may not matter
+    *nf2_out = nf0 + nf1;
+
+    memcpy(factors2, factors0, nf0*sizeof(long));
+    memcpy(exponents2, exponents0, nf0*sizeof(long));
+    memcpy(factors2 + nf0, factors1, nf1*sizeof(long));
+    memcpy(exponents2 + nf0, exponents1, nf1*sizeof(long));
+}
+
 long num_proper_divisors(long nf, long exponents[])
 {
     long ret = 1l;
@@ -177,8 +190,15 @@ long num_proper_divisors(long nf, long exponents[])
     return ret;
 }
 
-static void accum_divisors(long total, long nf, long factors[], long exponents[], long *nout, long *out) {
+static void accum_divisors(long min, long max, long total, long nf, long factors[], long exponents[], long *nout, long *out) {
+    if(max >= 0 && total > max)
+        return;
+
     if(nf <= 0) {
+        if(min >= 0 && total < min) {
+            return;
+        }
+
         out[*nout] = total;
         (*nout)++;
 
@@ -187,7 +207,7 @@ static void accum_divisors(long total, long nf, long factors[], long exponents[]
 
     long i;
     for(i = 0; i <= exponents[nf-1]; i++) {
-        accum_divisors(total, nf-1, factors, exponents, nout, out);
+        accum_divisors(min, max, total, nf-1, factors, exponents, nout, out);
 
         total *= factors[nf-1];
     }
@@ -198,7 +218,19 @@ void divisors(long nf, long factors[], long exponents[], long *nd_out, long **di
     long *divisors = malloc(npd*sizeof(long));
     long zero = 0;
 
-    accum_divisors(1l, nf, factors, exponents, &zero, divisors);
+    accum_divisors(-1, -1, 1l, nf, factors, exponents, &zero, divisors);
+
+    *nd_out = npd;
+    *divisors_out = divisors;
+}
+
+void bounded_divisors(long min, long max, long nf, long factors[], long exponents[], long *nd_out, long **divisors_out) {
+    long npd = num_proper_divisors(nf, exponents);
+    long *divisors = malloc(npd*sizeof(long));
+
+    npd = 0;
+
+    accum_divisors(min, max, 1l, nf, factors, exponents, &npd, divisors);
 
     *nd_out = npd;
     *divisors_out = divisors;

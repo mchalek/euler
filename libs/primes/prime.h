@@ -13,5 +13,10 @@ void factor(long x, long primes[], long np, long *nfactors, long pfactors[], lon
 
 long num_proper_divisors(long nf, long exponents[]);
 void divisors(long nf, long factors[], long exponents[], long *nd, long **divisors_out);
+void bounded_divisors(long min, long max, long nf, long factors[], long exponents[], long *nd_out, long **divisors_out);
+
+void merge_factors(long nf0, long factors0[], long exponents0[],
+        long nf1, long factors1[], long exponents1[],
+        long *nf2_out, long factors2[], long exponents2[]);
 
 #endif
