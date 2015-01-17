@@ -171,12 +171,25 @@ void merge_factors(long nf0, long factors0[], long exponents0[],
         long *nf2_out, long factors2[], long exponents2[])
 {
     // this is a wasteful algorithm but it may not matter
-    *nf2_out = nf0 + nf1;
+    *nf2_out = nf0;
 
     memcpy(factors2, factors0, nf0*sizeof(long));
     memcpy(exponents2, exponents0, nf0*sizeof(long));
-    memcpy(factors2 + nf0, factors1, nf1*sizeof(long));
-    memcpy(exponents2 + nf0, exponents1, nf1*sizeof(long));
+
+    long i, j;
+    for(i = 0; i < nf1; i++) {
+        for(j = 0; j < nf0; j++) {
+            if(factors0[j] == factors1[i]) {
+                exponents2[j] += exponents1[i];
+                break;
+            }
+        }
+
+        if(j == nf0) {
+            exponents2[*nf2_out] = exponents1[i];
+            factors2[(*nf2_out)++] = factors1[i];
+        }
+    }
 }
 
 long num_proper_divisors(long nf, long exponents[])
