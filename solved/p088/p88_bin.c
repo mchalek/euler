@@ -1,6 +1,6 @@
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
-#include <prime.h>
 
 #define MIN_K 2
 #define MAX_K 12000
@@ -101,9 +101,6 @@ void insert(dsum_t *ds, int n, long ndiv, long div[]) {
 
 int main()
 {
-    long *p, np;
-    primes(MAX_I, &p, &np);
-
     dsum_t *ds = calloc(1 + MAX_I, sizeof(dsum_t));
 
     ds[1].nsum = 0;
@@ -115,17 +112,24 @@ int main()
 
     int i;
     int filled = 0;
-    for(i = 2; i <= MAX_I && filled < MAX_K - MIN_K + 1; i++) {
-        long f[20], e[20];
-        long nf;
-        factor(i, p, np, &nf, f, e);
 
-        long nd, *div;
-        divisors(nf, f, e, &nd, &div);
+    long *div;
+    div = malloc((1 + MAX_I)*sizeof(long));
+    div[0] = 1;
+    for(i = 2; i <= MAX_I && filled < MAX_K - MIN_K + 1; i++) {
+        int j;
+        long nd = 1;
+        int max_j = (int) ceil(sqrt(i));
+        for(j = 2; j <= max_j; j++) {
+            if(!(i % j)) {
+                div[nd++] = j;
+                div[nd++] = i / j;
+            }
+        }
+        div[nd++] = i;
 
         insert(ds, i, nd, div);
 
-        int j;
         for(j = 0; j < ds[i].nsum; j++) {
             int k = i - ds[i].sums[j].sum + ds[i].sums[j].count;
 
