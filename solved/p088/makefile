@@ -1,6 +1,5 @@
-CFLAGS=-I../../libs/primes/ -g -O3 -Wall -Wextra
-LDFLAGS=-L../../libs/primes
-LDLIBS=-lprime -lm
+CFLAGS=-g -O3 -Wall -Wextra
+LDLIBS=-lm
 
 all: p88_bin
 

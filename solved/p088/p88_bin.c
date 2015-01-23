@@ -139,7 +139,6 @@ int main()
             if(!mps[k]) {
                 mps[k] = i;
                 filled++;
-
             }
         }
     }
