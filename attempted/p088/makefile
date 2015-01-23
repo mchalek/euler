@@ -5,4 +5,4 @@ LDLIBS=-lprime
 all: p88_bin
 
 clean:
-	rm -f p88
+	rm -f p88_bin

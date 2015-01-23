@@ -1,0 +1,4 @@
+#!/bin/bash
+
+make p88_bin
+./p88_bin | cut -d ' ' -f 4 | sort | uniq | awk '{i += $0} END {print i}'
