@@ -114,7 +114,8 @@ int main()
     int *mps = calloc(1 + MAX_K, sizeof(int));
 
     int i;
-    for(i = 2; i <= MAX_I; i++) {
+    int filled = 0;
+    for(i = 2; i <= MAX_I && filled < MAX_K - MIN_K + 1; i++) {
         long f[20], e[20];
         long nf;
         factor(i, p, np, &nf, f, e);
@@ -133,6 +134,8 @@ int main()
 
             if(!mps[k]) {
                 mps[k] = i;
+                filled++;
+
             }
         }
     }
