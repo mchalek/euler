@@ -16,20 +16,6 @@ def A(n):
 
     return k
 
-def off_per(n):
-    offset = A(n)
-
-    k = 1
-    z = 1
-
-    while z != 0:
-        k += 1
-        z *= 10
-        z += 1
-        z %= n
-
-    return (offset, k)
-
 def getprimes(N):
     iscomp = [False]*N
     primes = []
@@ -55,10 +41,9 @@ csum = 0
 for p in primes:
     if p == 2 or p == 5:
         continue
-    (offset, per) = off_per(p)
-    #print('%d => %d x %d' % (p, offset, per))
+    a = A(p)
 
-    if (target - offset) % per == 0:
+    if target % a == 0:
         print('%d is a root of R(%d)' % (p, target))
         count += 1
         csum += p
