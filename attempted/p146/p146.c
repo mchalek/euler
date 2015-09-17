@@ -29,7 +29,6 @@ bool check(long n) {
 
 int main()
 {
-
     primes(NMAX + 100, &p, &np);
 
     long i;
@@ -37,17 +36,25 @@ int main()
 
     int nz = 0;
     for(i = 10; i < NMAX; i += 10) {
+        if(!(i % 100000))
+            printf("done with i == %ld\n", i);
+
         if(!(i % 3))
             continue;
 
-        if(!(i % 7))
+        // only valid values for i % 7 are {3, 4}
+        long mod7 = i % 7;
+        if(!(mod7 == 3 || mod7 == 4))
             continue;
 
-        if(!(i % 13))
+        long mod11 = i % 11;
+        if(mod11 == 2 || mod11 == 3 || mod11 == 8 || mod11 == 9)
             continue;
 
-        if(!(i % 100000))
-            printf("done with i == %ld\n", i);
+        // invalid values for i % 13 are {0, 5, 6, 7, 8}
+        long mod13 = i % 13;
+        if((mod13 == 0) || (mod13 > 4 && mod13 < 9)) 
+            continue;
 
         bool hit = check(i);
 
