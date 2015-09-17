@@ -4,11 +4,31 @@
 //#define NMAX 150000000
 #define NMAX 1000000l
 
+long *p, np;
+int seq[] = {7, 9, 13, 27};
+
+bool check(long n) {
+    long n2 = n*n;
+    bool hit = false;
+    if(isprime(n2+1, p, np) && isprime(n2+3, p, np)) {
+        int j, k;
+        hit = true;
+        k = 0;
+        for(j = 5; hit && j <= 27; j += 2) {
+            if(seq[k] == j) {
+                hit &= isprime(n2+j, p, np);
+                k++;
+            } else {
+                hit &= !isprime(n2+j, p, np);
+            }
+        }
+    }
+
+    return hit;
+}
+
 int main()
 {
-    long *p, np;
-
-    int seq[] = {7, 9, 13, 27};
 
     primes(NMAX + 100, &p, &np);
 
@@ -20,25 +40,12 @@ int main()
         if(!(i % 100000))
             printf("done with i == %ld\n", i);
 
-        long i2 = i*i;
-        if(isprime(i2+1, p, np) && isprime(i2+3, p, np)) {
-            int j, k;
-            bool hit = true;
-            k = 0;
-            for(j = 5; hit && j <= 27; j += 2) {
-                if(seq[k] == j) {
-                    hit &= isprime(i2+j, p, np);
-                    k++;
-                } else {
-                    hit &= !isprime(i2+j, p, np);
-                }
-            }
-            
-            if(hit) {
-                printf("hit for i == %ld\n", i);
-                sum += i;
-                nz++;
-            }
+        bool hit = check(i);
+
+        if(hit) {
+            printf("hit for i == %ld\n", i);
+            sum += i;
+            nz++;
         }
     }
 
