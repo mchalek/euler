@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <prime.h>
 
-//#define NMAX 150000000
-#define NMAX 1000000l
+#define NMAX 150000000l
+//#define NMAX 1000000l
 
 long *p, np;
 int seq[] = {7, 9, 13, 27};
@@ -37,6 +37,15 @@ int main()
 
     int nz = 0;
     for(i = 10; i < NMAX; i += 10) {
+        if(!(i % 3))
+            continue;
+
+        if(!(i % 7))
+            continue;
+
+        if(!(i % 13))
+            continue;
+
         if(!(i % 100000))
             printf("done with i == %ld\n", i);
 
