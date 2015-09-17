@@ -1,11 +1,14 @@
 #!/usr/bin/python
 
 def max_subsequence(seq):
-    best = 0
+    result = 0
+    best_running = 0
     for x in seq:
-        best = max(best + x, x, 0)
+        best_running = max(best_running + x, x, 0)
+
+        result = max(result, best_running)
         
-    return best
+    return result
 
 def extract_column(matrix, index):
     col = []
