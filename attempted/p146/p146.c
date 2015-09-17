@@ -8,8 +8,7 @@ int main()
 {
     long *p, np;
 
-    int seq[] = {3, 7, 9, 13, 27};
-    int nseq = sizeof(seq)/sizeof(int);
+    int seq[] = {7, 9, 13, 27};
 
     primes(NMAX + 100, &p, &np);
 
@@ -22,19 +21,17 @@ int main()
             printf("done with i == %ld\n", i);
 
         long i2 = i*i;
-        if(isprime(i2+1, p, np)) {
-            //printf("further testing for i == %ld (%ld)\n", i, i*i+1);
-            int j;
+        if(isprime(i2+1, p, np) && isprime(i2+3, p, np)) {
+            int j, k;
             bool hit = true;
-            for(j = 0; hit && j < nseq; j++) {
-                if(j) {
-                    int k;
-                    for(k = seq[j-1] + 2; k < seq[j]; k += 2) {
-                        hit &= !isprime(i2+k, p, np);
-                    }
+            k = 0;
+            for(j = 5; hit && j <= 27; j += 2) {
+                if(seq[k] == j) {
+                    hit &= isprime(i2+j, p, np);
+                    k++;
+                } else {
+                    hit &= !isprime(i2+j, p, np);
                 }
-                bool test = isprime(i2+seq[j], p, np);
-                hit &= test;
             }
             
             if(hit) {
