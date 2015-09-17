@@ -1,15 +1,11 @@
 #!/usr/bin/python
 
 def max_subsequence(seq):
-    mx = 0 # assume empty subsequence is permitted
-
-    best_running = 0
+    best = 0
     for x in seq:
-        best_running = max(best_running + x, x, 0)
+        best = max(best + x, x, 0)
         
-        if best_running > mx:
-            mx = best_running
-    return best_running
+    return best
 
 def extract_column(matrix, index):
     col = []
