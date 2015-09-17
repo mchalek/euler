@@ -2,7 +2,7 @@
 #include <prime.h>
 
 //#define NMAX 150000000
-#define NMAX 1000000
+#define NMAX 1000000l
 
 int main()
 {
@@ -17,10 +17,12 @@ int main()
     long sum = 0l;
 
     int nz = 0;
-    for(i = 2; i < NMAX; i += 2) {
+    for(i = 10; i < NMAX; i += 10) {
         if(!(i % 100000))
             printf("done with i == %ld\n", i);
-        if(isprime(i*i+1, p, np)) {
+
+        long i2 = i*i;
+        if(isprime(i2+1, p, np)) {
             //printf("further testing for i == %ld (%ld)\n", i, i*i+1);
             int j;
             bool hit = true;
@@ -28,16 +30,17 @@ int main()
                 if(j) {
                     int k;
                     for(k = seq[j-1] + 2; k < seq[j]; k += 2) {
-                        hit &= !isprime(i*i+k, p, np);
+                        hit &= !isprime(i2+k, p, np);
                     }
                 }
-                bool test = isprime(i*i+seq[j], p, np);
+                bool test = isprime(i2+seq[j], p, np);
                 hit &= test;
             }
             
             if(hit) {
                 printf("hit for i == %ld\n", i);
                 sum += i;
+                nz++;
             }
         }
     }
