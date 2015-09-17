@@ -33,7 +33,7 @@ def extract_diagonal(matrix, index):
 def extract_anti_diagonal(matrix, index):
     if index < 0:
         i = 0
-        j = len(matrix)-1-index
+        j = len(matrix)-1+index
     else:
         i = index
         j = len(matrix)-1
@@ -56,6 +56,7 @@ def find_best(matrix):
         col = extract_column(matrix, i)
         mx = max(mx, max_subsequence(col))
 
+    for i in range(1-len(matrix), len(matrix)):
         diag = extract_diagonal(matrix, i)
         mx = max(mx, max_subsequence(diag))
 
