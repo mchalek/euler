@@ -17,15 +17,12 @@ inline long rand_int(long a, long b) {
 #endif
 
 bool mr_isprime(uint64_t n) {
-    bool doit = (n == 5230182401);
     if(!(n & 1))
         return false;
 
     uint64_t d = n-1;
     int r = _trailz(d);
     d >>= r;
-
-    printf("%ld == 2^%d %ld\n", n-1, r, d);
 
     int i;
     bool possibly_prime = true;
@@ -36,22 +33,14 @@ bool mr_isprime(uint64_t n) {
         
         uint64_t xc = x;
 
-        if(doit) {
-            printf("chose a == %ld\n", a);
-            printf("%ld^%ld == %ld mod %ld\n", a, d, x, n);
-        }
-
-
         if(x == 1ul || x == (n-1))
             continue;
 
         int j;
         possibly_prime = false;
         for(j = 0; j < r-1; j++) {
+            // use uipow for the overflow safety it provides
             x = uipow(x, 2, n);
-
-            if(doit)
-                printf("%ld^(2^%d) == %ld mod %ld\n", xc, j+1, x, n);
 
             if(x == 1ul) {
                 possibly_prime = false;
