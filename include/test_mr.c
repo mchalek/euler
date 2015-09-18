@@ -2,7 +2,7 @@
 
 int main(void) {
     int x;
-    for(x = 13; x < 300; x++) {
+    for(x = 13; x < 1000; x++) {
         printf("mr(%d): %d\n", x, mr_isprime(x));
     }
 
