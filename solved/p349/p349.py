@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
+# ant eventually reaches a repeated pattern of d_n_black
+# run the ant out until it gets into the repeate phase, then
+# identify the cycle properties and compute out the answer after
+# 10^18 steps
+
 def count(dn, N):
     max_cycle = 1000
 
