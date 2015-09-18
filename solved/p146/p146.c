@@ -1,25 +1,24 @@
 #include <stdio.h>
-#include <prime.h>
+#include <miller_rabin.h>
 
 #define NMAX 150000000l
 //#define NMAX 1000000l
 
-long *p, np;
 int seq[] = {7, 9, 13, 27};
 
 bool check(long n) {
     long n2 = n*n;
     bool hit = false;
-    if(isprime(n2+1, p, np) && isprime(n2+3, p, np)) {
+    if(mr_isprime(n2+1) && mr_isprime(n2+3)) {
         int j, k;
         hit = true;
         k = 0;
         for(j = 5; hit && j <= 27; j += 2) {
             if(seq[k] == j) {
-                hit &= isprime(n2+j, p, np);
+                hit &= mr_isprime(n2+j);
                 k++;
             } else {
-                hit &= !isprime(n2+j, p, np);
+                hit &= !mr_isprime(n2+j);
             }
         }
     }
@@ -29,8 +28,6 @@ bool check(long n) {
 
 int main()
 {
-    primes(NMAX + 100, &p, &np);
-
     long i;
     long sum = 0l;
 
