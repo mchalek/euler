@@ -31,8 +31,6 @@ bool mr_isprime(uint64_t n) {
 
         uint64_t x = uipow(a, d, n);
         
-        uint64_t xc = x;
-
         if(x == 1ul || x == (n-1))
             continue;
 

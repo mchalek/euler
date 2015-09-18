@@ -28,8 +28,12 @@ bool isprime(long x, long *p, long np)
     if(x <= p[np-1])
         return NULL != bsearch(&x, p, np, sizeof(long), lcmp);
 
-    bool mr = mr_isprime(x);
+    // do miller-rabin for speedy first-pass check
+    if(!mr_isprime(x))
+        return false;
 
+    // we want determinism, so if miller-rabin says it's prime, 
+    // confirm via brute force
     long i = 0;
     for(i = 0; i < np; i++) {
         if(p[i]*p[i] >= x)
@@ -39,9 +43,6 @@ bool isprime(long x, long *p, long np)
             return false;
     }
 
-    if(!mr) {
-        printf("FUCKED UP ON %ld\n", x);
-    }
     return true;
 }
 
