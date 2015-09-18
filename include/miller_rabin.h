@@ -48,8 +48,7 @@ bool mr_isprime(uint64_t n) {
         int j;
         possibly_prime = false;
         for(j = 0; j < r-1; j++) {
-            x *= x;
-            x %= n;
+            x = uipow(x, 2, n);
 
             if(doit)
                 printf("%ld^(2^%d) == %ld mod %ld\n", xc, j+1, x, n);
