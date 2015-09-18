@@ -13,10 +13,10 @@ static inline uint64_t uipow(uint64_t a, uint64_t b, uint64_t modulus)
     if(a == 1 || b == 0)
         return 1ul;
 
-    if(b == 1)
-        return a % modulus;
-
     a %= modulus;
+
+    if(b == 1)
+        return a;
 
     uint64_t result = 1ul;
     uint64_t y = 1ul;
