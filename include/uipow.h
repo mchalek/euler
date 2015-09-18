@@ -24,34 +24,21 @@ static inline uint64_t uipow(uint64_t a, uint64_t b, uint64_t modulus)
 
     a %= modulus;
 
-    uint64_t powers_of_2[64];
-
-    uint64_t result = a;
-    int pow = 0;
-
-    uint64_t exp = 1ul;
+    uint64_t a2n = a; // a^(2^n), starting with n == 0
+    uint64_t y = 1ul;
+    uint64_t result = 1ul;
     do {
-        powers_of_2[pow++] = result;
-        result *= result;
-        result %= modulus;
-        exp <<= 1;
-    } while(exp < b);
-
-    uint64_t ret = 1;
-    pow--;
-    exp = 1ul << pow;
-    for( ; b ; pow--) {
-        int i;
-        int n = b / exp;
-        for(i = 0; i < n; i++) {
-            ret *= powers_of_2[pow];
-            ret %= modulus;
+        if(b & y) {
+            result *= a2n;
+            result %= modulus;
+            b ^= exp;
         }
-        b %= exp;
-        exp >>= 1;
-    }
+        a2n *= a2n;
+        a2n %= modulus;
+        y <<= 1;
+    } while(b);
 
-    return ret;
+    return result;
 }
 
 #endif

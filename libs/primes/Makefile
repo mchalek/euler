@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Wextra -g -O3 -I. --std=c11
+CFLAGS=-Wall -Wextra -g -O3 -I. --std=c11 -I../../include/
 
 all: libprime.a test
 

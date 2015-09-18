@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Wextra -g -O3 -I../../libs/primes/
+CFLAGS=-Wall -Wextra -g -O3 -I../../libs/primes/ -I../../include/
 LDLIBS=-L../../libs/primes/ -lprime
 
 all: p146

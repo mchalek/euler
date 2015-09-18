@@ -9,14 +9,15 @@
 #define MIN(a, b) (((a) > (b)) ? (b) : (a))
 
 #ifndef __KM_RAND_H
-inline int rand_int(int a, int b) {
-    int x = rand() % (b-a);
+inline long rand_int(long a, long b) {
+    long x = rand() % (b-a);
 
     return a + x;
 }
 #endif
 
 bool mr_isprime(uint64_t n) {
+    bool doit = (n == 5230182401);
     if(!(n & 1))
         return false;
 
@@ -24,14 +25,24 @@ bool mr_isprime(uint64_t n) {
     int r = _trailz(d);
     d >>= r;
 
+    printf("%ld == 2^%d %ld\n", n-1, r, d);
+
     int i;
     bool possibly_prime = true;
     for(i = 0; i < 5 && possibly_prime; i++) {
-        int a = rand_int(2, MIN(RAND_MAX, n-1));
+        uint64_t a = rand_int(2, MIN(RAND_MAX, n-1));
 
-        long x = uipow(a, d, n);
+        uint64_t x = uipow(a, d, n);
+        
+        uint64_t xc = x;
 
-        if(x == 1 || x == (n-1))
+        if(doit) {
+            printf("chose a == %ld\n", a);
+            printf("%ld^%ld == %ld mod %ld\n", a, d, x, n);
+        }
+
+
+        if(x == 1ul || x == (n-1))
             continue;
 
         int j;
@@ -40,7 +51,10 @@ bool mr_isprime(uint64_t n) {
             x *= x;
             x %= n;
 
-            if(x == 1) {
+            if(doit)
+                printf("%ld^(2^%d) == %ld mod %ld\n", xc, j+1, x, n);
+
+            if(x == 1ul) {
                 possibly_prime = false;
                 break;
             }

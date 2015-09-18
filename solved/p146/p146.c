@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <prime.h>
 
-#define NMAX 150000000l
-//#define NMAX 1000000l
+//#define NMAX 150000000l
+#define NMAX 1000000l
 
 long *p, np;
 int seq[] = {7, 9, 13, 27};
