@@ -31,7 +31,7 @@ static inline uint64_t uipow(uint64_t a, uint64_t b, uint64_t modulus)
         if(b & y) {
             result *= a2n;
             result %= modulus;
-            b ^= exp;
+            b ^= y;
         }
         a2n *= a2n;
         a2n %= modulus;
