@@ -1,4 +1,4 @@
-#include "miller_rabin.h"
+#include <miller_rabin.h>
 
 int main(void) {
     int x;
