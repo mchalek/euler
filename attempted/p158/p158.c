@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <kmbits.h>
 
 long factorial(int n, int k) {
     long result = 1;
@@ -21,7 +22,6 @@ long nchoosek(long n, int k) {
 
 typedef struct {
     uint32_t mask;
-    int terminal;
     long count_with[26];
     long count_without[26];
 } counts_t;
@@ -74,15 +74,79 @@ int exhaust_fixed_density(int num_bits, int density, counts_t *items, int index[
 }
 
 int main(void) {
-    int density = 13;
-    int expected = nchoosek(26, density);
-    printf("expected items: %d\n", expected);
-    counts_t *items = calloc(expected, sizeof(counts_t));
+    int i;
+    counts_t *items = calloc(26, sizeof(counts_t));
     int *index = malloc((1 << 26)*sizeof(int));
+    int num_items = exhaust_fixed_density(26, 1, items, index);
 
-    int num_items = exhaust_fixed_density(26, density, items, index);
+    for(i = 0; i < num_items; i++) {
+        // generation is in order for these, so we are guaranteed that
+        // items[i].mask == 1 << i, so that the appropriate index for
+        // count_without increment is i.
+        items[i].count_without[i] = 1;
+    }
 
-    printf("items generated: %d\n", num_items);
+    long max_total_count = 0;
+    for(i = 1; i < 26; i++) {
+        const int density = 1 + i;
+
+        int num_new_items = nchoosek(26, density);
+        counts_t *new_items = calloc(num_new_items, sizeof(counts_t));
+        int *new_index = malloc((1 << 26) * sizeof(int));
+        exhaust_fixed_density(26, density, new_items, new_index);
+
+        int j;
+        long total_count = 0;
+        for(j = 0; j < num_new_items; j++) {
+            // j indexes into the different possible masks at the current
+            // density
+
+            const uint32_t mask = new_items[j].mask;
+            uint32_t destroyed_mask = mask;
+            int tz = _trailz(mask);
+            int last_item = tz;
+            while(destroyed_mask) {
+                destroyed_mask >>= 1 + tz;
+
+                // construct previous mask by removing last_item from current
+                // mask
+                uint32_t prev_mask = mask ^ (1u << last_item);
+                counts_t *prev = items + index[prev_mask];
+                int prev_item;
+                for(prev_item = 0; prev_item < last_item; prev_item++) {
+                    // last_item comes lex after prev_item, so add a hit
+                    new_items[j].count_with[last_item] += 
+                        prev->count_without[prev_item];
+                }
+
+                for(prev_item = 1 + last_item; prev_item < 26; prev_item++) {
+                    // last_item comes lex before prev_item, so no hit
+                    new_items[j].count_without[last_item] += 
+                        prev->count_without[prev_item];
+                    new_items[j].count_with[last_item] +=
+                        prev->count_with[prev_item];
+                }
+                    
+                tz = _trailz(destroyed_mask);
+                last_item += 1 + tz;
+            }
+
+            int k;
+            for(k = 0; k < 26; k++)
+                total_count += new_items[j].count_with[k];
+        }
+
+        printf("total count at density %d: %ld\n", density, total_count);
+
+        max_total_count = (total_count > max_total_count) ? total_count : max_total_count;
+
+        free(items);
+        free(index);
+        items = new_items;
+        index = new_index;
+    }
+
+    printf("max total count: %ld\n", max_total_count);
 
     return 0;
 }
