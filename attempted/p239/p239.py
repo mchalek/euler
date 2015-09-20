@@ -2,7 +2,7 @@
 
 primes = set([2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97])
 def check(N):
-    import itertools
+    import itertools, math
 
     perms = itertools.permutations(range(1, 1+N))
 
@@ -16,7 +16,7 @@ def check(N):
 
         counts[n_nat] += 1
 
-    return counts
+    return [float(x) / math.factorial(N) for x in counts]
 
 def compute(N):
     if N > 100:
@@ -54,12 +54,21 @@ def compute(N):
                     break
                 next_counts[n_nat] += j
 
-        counts = next_counts
+        counts = [float(x) / i for x in next_counts]
     return counts
 
-#for n in range(10):
-#    print(('compute(%d): ' % n) + str(compute(n)))
-#    print(('check(%d): ' % n) + str(check(n)))
+for n in range(10):
+    fast = compute(n)
+    correct = check(n)
 
-#counts = compute(100)
-#print('compute(100): ' + str(compute(100)))
+    diff = 0
+    for (idx, p) in enumerate(fast):
+        diff += (p - correct[idx])**2
+
+    if diff > 1e-15:
+        print('Error for n == %d' % n)
+        print('  computed: ' + str(fast))
+        print('   correct: ' + str(correct))
+
+counts = compute(100)
+print('solution: %.12f' % counts[3])
