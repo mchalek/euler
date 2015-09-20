@@ -57,18 +57,18 @@ def compute(N):
         counts = [float(x) / i for x in next_counts]
     return counts
 
-for n in range(10):
-    fast = compute(n)
-    correct = check(n)
-
-    diff = 0
-    for (idx, p) in enumerate(fast):
-        diff += (p - correct[idx])**2
-
-    if diff > 1e-15:
-        print('Error for n == %d' % n)
-        print('  computed: ' + str(fast))
-        print('   correct: ' + str(correct))
+#for n in range(10):
+#    fast = compute(n)
+#    correct = check(n)
+#
+#    diff = 0
+#    for (idx, p) in enumerate(fast):
+#        diff += (p - correct[idx])**2
+#
+#    if diff > 1e-15:
+#        print('Error for n == %d' % n)
+#        print('  computed: ' + str(fast))
+#        print('   correct: ' + str(correct))
 
 counts = compute(100)
 print('solution: %.12f' % counts[3])
