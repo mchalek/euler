@@ -43,26 +43,16 @@ def R(factors, extra_multiple=1):
     k = d - result
 
     decimal = float(k) / (d-1)
-    print('R[%d] == %d / %d ~ %.12f' % (d, k, d-1, decimal))
-
-    if k * 94744 < 15499 * (d-1):
-        print('SCORE')
-    else:
-        goal = float(15499) / 94744
-        print('U LOSE (goal is %.12f, u exceed by %.12f)' % (goal, decimal-goal))
-    print('==================================')
 
     return (k, d-1)
 
-pp = primes.primes(100)
-r = 1
-k = 0
-pz = []
-while r < 200000000000:
-   r *= pp[k]
-   pz.append(pp[k])
-   k += 1
-(num, den) = R(pz, 1)
+def coR(factors, extra_multiple=1):
+    (k, dd) = R(factors, extra_multiple)
 
-print('max denominator for coresilience problem 245 is %d' % (den / num))
+    n = dd + 1
 
+    print('Coresilience of %d is %d/%d' % (n, n-k, dd))
+
+    return (n-k, dd)
+
+(num, den) = coR([13], 1)
