@@ -2,21 +2,6 @@
 
 import primes
 
-# brute force method for testing
-def brute_force_k(d, factors):
-    k = 0
-    for i in range(1, d):
-        okay = True
-        for f in factors:
-            if i % f is 0:
-                okay = False
-                break
-
-        if okay:
-            k += 1
-
-    return k
-
 # let [p, d] be the set of all multiples of p that are <= d
 # then let p_1,...,p_r be the set of prime factors of d
 # the set of numerators <= d that are reducible with denominator d is:
@@ -57,11 +42,6 @@ def R(factors, extra_multiple=1):
 
     k = d - result
 
-    if d < 1000000:
-        bfk = brute_force_k(d, factors)
-        if k != bfk:
-            raise Exception('Incorrect value %d for (%d-1)*R[%d] (should be %d)!' % (k, d, d, bfk))
-
     decimal = float(k) / (d-1)
     print('R[%d] == %d / %d ~ %.12f' % (d, k, d-1, decimal))
 
@@ -73,23 +53,6 @@ def R(factors, extra_multiple=1):
     print('==================================')
 
     return (k, d-1)
-
-# testing
-R([2,3], 2)
-R([2,3,5,7],7)
-R([2,3,5,7,11,13],4)
-
-# more distinct primes => lower resilience
-# manually play around with the number of primes until you get close to a hit;
-# we are clearly looking for something that uses all primes up to and including 23;
-# product of primes gets us close but we must play around with multiples of the
-# smaller primes to reduce the resilience below the target threshold
-# (resilience decreases asymptotically as you increase the exponent of each prime factor)
-max_prime = 24
-pp = primes.primes(max_prime)
-mul = 4
-R(pp, mul)
-print('SOLUTION TO PROBLEM 243: %d' % (mul * reduce(lambda x, y: x*y, pp)))
 
 pp = primes.primes(100)
 r = 1
