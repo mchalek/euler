@@ -3,9 +3,9 @@
 import primes
 
 # brute force method for testing
-def brute_force_k(n, factors):
+def brute_force_k(d, factors):
     k = 0
-    for i in range(1, n):
+    for i in range(1, d):
         okay = True
         for f in factors:
             if i % f is 0:
@@ -22,13 +22,17 @@ def brute_force_k(n, factors):
 # the set of numerators <= d that are reducible with denominator d is:
 # N_d = [p_1, d] U [p_2, d] U ... U [p_r, d].
 # so we compute |N| via inclusion/exclusion principle, then resilience is equal to
-# (|N_d| - 1) / (d-1)
+# (d - |N_d|) / (d-1)
 
-def sum_groupings(group_size, n, items):
+
+# sum_groupings computes the sum of cardinalities of all intersections
+# [p_a, d] & [p_b, d] & ... & [p_g, d]
+# of size group_size, where items[] is the list of prime factors of d
+def sum_groupings(group_size, d, items):
     def worker(cur_used, min_idx):
         if len(cur_used) == group_size:
             k = reduce(lambda x, y: x*y, cur_used)
-            return n / k - 1
+            return d / k
 
         remaining = group_size - len(cur_used)
         max_idx = len(items) - remaining
@@ -39,29 +43,29 @@ def sum_groupings(group_size, n, items):
         return result
 
     if group_size == 1:
-        return sum([n / k - 1 for k in items])
+        return sum([d / k for k in items])
 
     return worker([], 0)
 
 def R(factors, extra_multiple=1):
-    n = extra_multiple * reduce(lambda x, y: x * y, factors)
+    d = extra_multiple * reduce(lambda x, y: x * y, factors)
     m = 1
     result = 0
     for i in range(len(factors)):
-        result += m*sum_groupings(1+i, n, factors)
+        result += m*sum_groupings(1+i, d, factors)
         m *= -1
 
-    k = n - 1 - result
+    k = d - result
 
-    if n < 1000000:
-        bfk = brute_force_k(n, factors)
+    if d < 1000000:
+        bfk = brute_force_k(d, factors)
         if k != bfk:
-            raise Exception('Incorrect value %d for (%d-1)*R[%d] (should be %d)!' % (k, n, n, bfk))
+            raise Exception('Incorrect value %d for (%d-1)*R[%d] (should be %d)!' % (k, d, d, bfk))
 
-    decimal = float(k) / (n-1)
-    print('R[%d] == %d / %d ~ %.12f' % (n, k, n-1, decimal))
+    decimal = float(k) / (d-1)
+    print('R[%d] == %d / %d ~ %.12f' % (d, k, d-1, decimal))
 
-    if k * 94744 < 15499 * (n-1):
+    if k * 94744 < 15499 * (d-1):
         print('SCORE')
     else:
         goal = float(15499) / 94744
