@@ -4,7 +4,7 @@
 # always takes the form 1 0 0 ... 0 1,
 # so that the tree from rows 0 to 7**i-1 is repeated on each end, summing the
 # overlapping results such that after one addition the bottom row is 
-# 1 0 0 ... 0 0 2 0 0 ... 0 01, and after 3 additions it is
+# 1 0 0 ... 0 0 2 0 0 ... 0 01, and after 2 additions it is
 # 1 0 0 ... 0 0 3 0 0 ... 0 0 3 0 0 ... 0 0 1,
 # etc.
 
