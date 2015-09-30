@@ -123,15 +123,7 @@ int main(void) {
 
     segment_t i0;
     bool z = check(&s0, &s1, &i0);
-    /*
-    if(!z) {
-        printf("FAIL\n");
-    } else {
-        printf("%ld/%ld, %ld/%ld\n", i0.p0.a, i0.p0.b, i0.p1.a, i0.p1.b);
-    }
 
-    return 0;
-*/
     generate(N, segments);
 
     int i;
@@ -156,8 +148,6 @@ int main(void) {
             }
         }
     }
-
-    printf("%d total hits (including duplicates)\n", n_intersections);
 
     return 0;
 }
