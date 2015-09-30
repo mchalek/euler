@@ -255,3 +255,23 @@ void bounded_divisors(long min, long max, long nf, long factors[], long exponent
     *nd_out = npd;
     *divisors_out = divisors;
 }
+
+void reduce(long n, long d, long np, long p[], long *n_red, long *d_red) {
+    long i;
+    long mx = (n < d) ? n : d;
+
+    for(i = 0; i < np; i++) {
+        while(!(n % p[i]) && !(d % p[i])) {
+            n /= p[i];
+            d /= p[i];
+            mx /= p[i];
+        }
+
+        if(p[i]*p[i] > mx)
+            break;
+    }
+
+    *n_red = n;
+    *d_red = d;
+}
+
