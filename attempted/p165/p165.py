@@ -88,21 +88,21 @@ print('check p1, p2: ' + str(check(p1, p2)))
 print('check p2, p3: ' + str(check(p2, p3)))
 print('check p1, p3: ' + str(check(p1, p3)))
 
-intersections = set([])
-num_raw = 0
-for i in range(len(segments)):
-    if i % 100 == 0:
-        print('working on segment %d' % i)
-    a = segments[i]
-    for j in range(1 + i, len(segments)):
-        b = segments[j]
-
-        x = check(a, b)
-
-        if x is not None:
-            num_raw += 1
-            intersections.add(x)
-
-print('total number of intersections: %d' % num_raw)
-print('number of unique intersections: %d' % len(intersections))
+#intersections = set([])
+#num_raw = 0
+#for i in range(len(segments)):
+#    if i % 100 == 0:
+#        print('working on segment %d' % i)
+#    a = segments[i]
+#    for j in range(1 + i, len(segments)):
+#        b = segments[j]
+#
+#        x = check(a, b)
+#
+#        if x is not None:
+#            num_raw += 1
+#            intersections.add(x)
+#
+#print('total number of intersections: %d' % num_raw)
+#print('number of unique intersections: %d' % len(intersections))
 
