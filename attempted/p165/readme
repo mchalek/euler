@@ -1,0 +1,3 @@
+to compute result:
+
+./p165 | sort | uniq | wc -l
