@@ -120,20 +120,6 @@ int main(void) {
     int n_intersections = 0;
     segment_t *intersections = malloc(nalloc*sizeof(segment_t));
 
-    segment_t s0,s1;
-    s0.p0.a = 46;
-    s0.p0.b = 53;
-    s0.p1.a = 17;
-    s0.p1.b = 62;
-
-    s1.p0.a = 46;
-    s1.p0.b = 70;
-    s1.p1.a = 22;
-    s1.p1.b = 40;
-
-    segment_t i0;
-    bool z = check(&s0, &s1, &i0);
-
     generate(N, segments);
 
     int i;
