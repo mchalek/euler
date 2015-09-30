@@ -42,21 +42,21 @@ def check(l0, l1):
         #print('s == %s; sf == %s' % (str(s), str(sf)))
 
         if 0 < s < 1:
-#            tf = Fraction(num, den)
-#            if e == g:
-#                sf = (tf * (b-d) + (d-h)) * Fraction(1, f-h)
-#            else:
-#                sf = (tf * (a-c) + (c-g)) * Fraction(1, e-g)
+            tf = Fraction(num, den)
+            if e == g:
+                sf = (tf * (b-d) + (d-h)) * Fraction(1, f-h)
+            else:
+                sf = (tf * (a-c) + (c-g)) * Fraction(1, e-g)
 
             #if 0 < sf < 1 and 0 < tf < 1:
             # compute intersection point and return
-            x = t*a + (1-t)*c
-            y = t*b + (1-t)*d 
-            return (x, y)
+            #x = t*a + (1-t)*c
+            #y = t*b + (1-t)*d 
+            #return (x, y)
 
-            #xf = tf*a + (1-tf)*c
-            #yf = tf*b + (1-tf)*d 
-            #return (xf.tuple(), yf.tuple())
+            xf = tf*a + (1-tf)*c
+            yf = tf*b + (1-tf)*d 
+            return (xf, yf)
 
     return None
 
@@ -88,21 +88,23 @@ print('check p1, p2: ' + str(check(p1, p2)))
 print('check p2, p3: ' + str(check(p2, p3)))
 print('check p1, p3: ' + str(check(p1, p3)))
 
-#intersections = set([])
-#num_raw = 0
-#for i in range(len(segments)):
-#    if i % 100 == 0:
-#        print('working on segment %d' % i)
-#    a = segments[i]
-#    for j in range(1 + i, len(segments)):
-#        b = segments[j]
-#
-#        x = check(a, b)
-#
-#        if x is not None:
-#            num_raw += 1
-#            intersections.add(x)
-#
-#print('total number of intersections: %d' % num_raw)
-#print('number of unique intersections: %d' % len(intersections))
+intersections = set([])
+num_raw = 0
+for i in range(len(segments)):
+    #if i % 100 == 0:
+    #    print('working on segment %d' % i)
+    a = segments[i]
+    for j in range(1 + i, len(segments)):
+        b = segments[j]
+
+        x = check(a, b)
+
+        if x is not None:
+            (xf, yf) = x
+            num_raw += 1
+            print('%s\t%s' % (str(xf), str(yf)))
+            intersections.add((xf.tuple(), yf.tuple()))
+
+print('total number of intersections: %d' % num_raw)
+print('number of unique intersections: %d' % len(intersections))
 
