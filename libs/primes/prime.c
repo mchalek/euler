@@ -260,15 +260,18 @@ void reduce(long n, long d, long np, long p[], long *n_red, long *d_red) {
     long i;
     long mx = (n < d) ? n : d;
 
-    for(i = 0; i < np; i++) {
-        while(!(n % p[i]) && !(d % p[i])) {
-            n /= p[i];
-            d /= p[i];
-            mx /= p[i];
-        }
+    // do a prime factorization of smaller of n and d, and then reduce
+    // the pair together as is possible
+    long nf; // num factors
+    long factors[32];
+    long exponents[32];
+    factor(mx, p, np, &nf, factors, exponents);
 
-        if(p[i] > mx)
-            break;
+    for(i = 0; i < nf; i++) {
+        while(!(n % factors[i]) && !(d % factors[i])) {
+            n /= factors[i];
+            d /= factors[i];
+        }
     }
 
     *n_red = n;
