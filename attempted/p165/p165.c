@@ -123,6 +123,7 @@ int main(void) {
 
     segment_t i0;
     bool z = check(&s0, &s1, &i0);
+    /*
     if(!z) {
         printf("FAIL\n");
     } else {
@@ -130,7 +131,7 @@ int main(void) {
     }
 
     return 0;
-
+*/
     generate(N, segments);
 
     int i;
@@ -142,7 +143,15 @@ int main(void) {
             if(!hit)
                 continue;
 
-            printf("%ld/%ld\t%ld/%ld\n",
+            printf("(%ld,%ld)<->(%ld,%ld) & (%ld,%ld)<->(%ld,%ld) => %ld/%ld\t%ld/%ld\n",
+                    segments[i].p0.a,
+                    segments[i].p0.b,
+                    segments[i].p1.a,
+                    segments[i].p1.b,
+                    segments[j].p0.a,
+                    segments[j].p0.b,
+                    segments[j].p1.a,
+                    segments[j].p1.b,
                     intersections[n_intersections].p0.a, 
                     intersections[n_intersections].p0.b, 
                     intersections[n_intersections].p1.a, 
