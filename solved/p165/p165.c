@@ -116,32 +116,23 @@ int main(void) {
     primes(10000000, &p, &np);
     segment_t *segments = malloc(N*sizeof(segment_t));
 
-    int nalloc = 1 << 20;
-    int n_intersections = 0;
-    segment_t *intersections = malloc(nalloc*sizeof(segment_t));
-
     generate(N, segments);
 
     int i;
     for(i = 0; i < N; i++) {
         int j;
         for(j = 1 + i; j < N; j++) {
-            bool hit = check(segments + i, segments + j, intersections + n_intersections);
+            segment_t intersection;
+            bool hit = check(segments + i, segments + j, &intersection);
 
             if(!hit)
                 continue;
 
             printf("%ld/%ld\t%ld/%ld\n",
-                    intersections[n_intersections].p0.a, 
-                    intersections[n_intersections].p0.b, 
-                    intersections[n_intersections].p1.a, 
-                    intersections[n_intersections].p1.b);
-
-            n_intersections++;
-            if(n_intersections == nalloc) {
-                nalloc <<= 1;
-                intersections = realloc(intersections, nalloc*sizeof(segment_t));
-            }
+                    intersection.p0.a, 
+                    intersection.p0.b, 
+                    intersection.p1.a, 
+                    intersection.p1.b);
         }
     }
 
