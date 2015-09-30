@@ -102,7 +102,10 @@ for i in range(len(segments)):
         if x is not None:
             (xf, yf) = x
             num_raw += 1
-            print('%s\t%s' % (str(xf), str(yf)))
+            print('(%d,%d)<->(%d,%d) & (%d,%d)<->(%d,%d) => %s\t%s' % (
+                a.a, a.b, a.c, a.d,
+                b.a, b.b, b.c, b.d,
+                str(xf), str(yf)))
             intersections.add((xf.tuple(), yf.tuple()))
 
 print('total number of intersections: %d' % num_raw)
