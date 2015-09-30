@@ -3,6 +3,16 @@
 #include <stdlib.h>
 #include <prime.h>
 
+/* Solve by writing each line segment parametrically:
+ *   l(t) = t p0 + (1-t) p1,
+ *   where p0 and p1 are the endpoints as 2-d vectors
+ *
+ *   Find intersection between segments by setting
+ *   l1(t) = l2(s) and solving for t, s.
+ *
+ *   If a solution exists with 0 < s,t < 1, then you've got it.
+ */
+
 #define N 5000
 
 long np;
