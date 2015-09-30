@@ -267,7 +267,7 @@ void reduce(long n, long d, long np, long p[], long *n_red, long *d_red) {
             mx /= p[i];
         }
 
-        if(p[i]*p[i] > mx)
+        if(p[i] > mx)
             break;
     }
 
