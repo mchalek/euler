@@ -143,15 +143,7 @@ int main(void) {
             if(!hit)
                 continue;
 
-            printf("(%ld,%ld)<->(%ld,%ld) & (%ld,%ld)<->(%ld,%ld) => %ld/%ld\t%ld/%ld\n",
-                    segments[i].p0.a,
-                    segments[i].p0.b,
-                    segments[i].p1.a,
-                    segments[i].p1.b,
-                    segments[j].p0.a,
-                    segments[j].p0.b,
-                    segments[j].p1.a,
-                    segments[j].p1.b,
+            printf("%ld/%ld\t%ld/%ld\n",
                     intersections[n_intersections].p0.a, 
                     intersections[n_intersections].p0.b, 
                     intersections[n_intersections].p1.a, 
