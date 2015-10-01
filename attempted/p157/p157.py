@@ -32,30 +32,27 @@
 # but it is unnecessary for this problem.
 
 def doit(n):
-    def count_factors(x, y, w):
-        if w == 1:
+    def count_factors(x, y, pz, k):
+        if pz == 1:
             return 1
 
-        result = 2 # automatically count (1, w)
+        result = 2 # automatically count (1, pz)
         i = 2
 
-        #print('Counting factors of %d' % w)
-        while i*i <= w:
-            if (w % i) == 0:
-                j = w / i
-                #print('Found some: %d, %d' % (i, j))
+        while i*i <= pz:
+            if (pz % i) == 0:
+                j = pz / i
 
-                result += 2
-
-                if i == j:
-                    result -= 1
+                if i != j:
+                    result += 2
+                else:
+                    result += 1
             i += 1
         return result
 
     def for_k(kparm):
         (k2, k5) = kparm # parameterize k by number of 2 and 5 factors
         k = 2**k2*5**k5
-        #print('for divisor %d: ' % k)
         xy2 = n-k2
         xy5 = n-k5
 
@@ -68,15 +65,13 @@ def doit(n):
         elif xy5 is 0:
             xy = [(2**xy2, 1)]
         else:
-            xy = [(2**xy2 * 5**xy2, 1), (5**xy5, 2**xy2)]
+            xy = [(2**xy2 * 5**xy5, 1), (5**xy5, 2**xy2)]
 
         result = 0
         for (x, y) in xy:
             pz = k*(x + y)
-            #print('(x, y): (%d, %d) => pz == %d' % (x, y, pz))
 
-            nf = count_factors(x, y, pz)
-            #print('    claim: %d has %d factors' % (pz, nf))
+            nf = count_factors(x, y, pz, k)
             result += nf
 
         return result
