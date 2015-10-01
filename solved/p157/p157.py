@@ -1,38 +1,35 @@
 #!/usr/bin/python
 
-# same as p108
+# very similar analysis to p110/p108
 # we are looking for
-#   1     1      1
-#  --- + --- == --- 
-#   x     y      n
+#   1     1       p
+#  --- + --- == -----
+#   a     b      10^n
 #
 # or:
 #
-#  n (x + y) 
-# ----------- == 1
-#      x y
+#  10^n (a + b) 
+# -------------- == 1
+#     p a b
 #
-# if we let z = gcd(x, y), and x / z == a, y / z == b, then we have:
+# if we let z = gcd(x, y), and a / z == x, b / z == y, then we have:
 #
-#  n (a + b) 
-# ----------- == 1
-#   z (a b)
+#  10^n (x + y) 
+# -------------- == 1
+#    p z (x y)
 # 
-# But a + b has no factors in common with a b, so we must have:
-#    n == a b k, for a and b coprime.  And then we must also have
-#    z == (a + b) k.
+# But x + y has no factors in common with x y, so we must have:
+#    10^n == x y k, for x and y coprime.  And then we must also have
+#     p z == (x + y) k.
 #
-# Then the number of distinct solutions is equal to the number of distinct
-# ways to draw a pair of coprime values, a and b, such that a*b is a divisor
-# of n.  We can compute this with a straightforward exhaust.
-#
-# Note that we can recover x and y for a given choice of a, b and k via:
-#  x = (a + b) k a
-#  y = (a + b) k b,
-# but it is unnecessary for this problem.
+# We can construct the solution by first generating all coprime pairs (x, y)
+# such that x y == 10^n k for some k.
+# Then we know that p z == (x + y) k, such that every distinct divisor d of
+# (x + y) k corresponds to a single solution, with p == d
 
 def doit(n):
-    def count_factors(x, y, pz, k):
+    def count_factors(pz):
+        # count the divisors of the product pz == (x + y) k
         if pz == 1:
             return 1
 
@@ -53,6 +50,8 @@ def doit(n):
     def for_k(kparm):
         (k2, k5) = kparm # parameterize k by number of 2 and 5 factors
         k = 2**k2*5**k5
+
+        # compute exponents of 2 and 5 in xy == 10^n / k
         xy2 = n-k2
         xy5 = n-k5
 
@@ -71,7 +70,7 @@ def doit(n):
         for (x, y) in xy:
             pz = k*(x + y)
 
-            nf = count_factors(x, y, pz, k)
+            nf = count_factors(pz)
             result += nf
 
         return result
