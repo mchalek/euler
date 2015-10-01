@@ -19,11 +19,17 @@
 #   z (a b)
 # 
 # But a + b has no factors in common with a b, so we must have:
-#    n == a b k, for a and b coprime.
+#    n == a b k, for a and b coprime.  And then we must also have
+#    z == (a + b) k.
 #
 # Then the number of distinct solutions is equal to the number of distinct
 # ways to draw a pair of coprime values, a and b, such that a*b is a divisor
-# of n.
+# of n.  We can compute this with a straightforward exhaust.
+#
+# Note that we can recover x and y for a given choice of a, b and k via:
+#  x = (a + b) k a
+#  y = (a + b) k b,
+# but it is unnecessary for this problem.
 
 
 def popcnt(x):
