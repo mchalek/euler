@@ -1,4 +1,7 @@
 #!/usr/bin/python
+
+# see p110 for description of algo
+
 def get_primes(N):                                                              
     composites = set([])                                                        
     primes = [2]                                                                

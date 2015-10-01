@@ -1,5 +1,31 @@
 #!/usr/bin/python
 
+# same as p108
+# we are looking for
+#   1     1      1
+#  --- + --- == --- 
+#   x     y      n
+#
+# or:
+#
+#  n (x + y) 
+# ----------- == 1
+#      x y
+#
+# if we let z = gcd(x, y), and x / z == a, y / z == b, then we have:
+#
+#  n (a + b) 
+# ----------- == 1
+#   z (a b)
+# 
+# But a + b has no factors in common with a b, so we must have:
+#    n == a b k, for a and b coprime.
+#
+# Then the number of distinct solutions is equal to the number of distinct
+# ways to draw a pair of coprime values, a and b, such that a*b is a divisor
+# of n.
+
+
 def popcnt(x):
     result = 0
     while x is not 0:
