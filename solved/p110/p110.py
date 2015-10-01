@@ -31,15 +31,6 @@
 #  y = (a + b) k b,
 # but it is unnecessary for this problem.
 
-
-def popcnt(x):
-    result = 0
-    while x is not 0:
-        if (x & 1) is 1:
-            result += 1
-        x >>= 1
-    return result
-
 def mask_counts(mask, powers):
     result = 1
 
@@ -55,26 +46,16 @@ def compute(powers):
     result = 0
     max_mask = 1 << nbits
     for i in range(max_mask):
-        pci = popcnt(i)
         n_left = mask_counts(i, powers)
-        for j in range(max_mask):
+        for j in range(1 + i):
             if (i & j) is not 0:
                 continue
                 
-            pcj = popcnt(j)
-            if j > i:
-                continue
-
             n_right = mask_counts(j, powers)
-
-            #print('%x[%d]  %x[%d] => %d' % (i, pci, j, pcj, n_left*n_right))
 
             result += n_left*n_right
 
-    product = 1
-    for i in range(len(powers)):
-        p = pp[i]
-        product *= p**powers[i]
+    product = reduce(lambda x, y: x*y, [pp[i]**e for (i, e) in enumerate(powers)])
 
     print('%s => %d => %d solutions' % (str(powers), product, result))
 
