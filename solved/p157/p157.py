@@ -51,20 +51,16 @@ def doit(n):
         (k2, k5) = kparm # parameterize k by number of 2 and 5 factors
         k = 2**k2*5**k5
 
-        # compute exponents of 2 and 5 in xy == 10^n / k
-        xy2 = n-k2
-        xy5 = n-k5
+        # compute powers of 2 and 5 in xy == 10^n / k
+        xy2 = 2**(n-k2)
+        xy5 = 5**(n-k5)
 
         # up to 2 different ways to factor xy as coprime pair, given that there
         # are only 2 prime factors
-        if xy2 is 0 and xy5 is 0:
-            xy = [(1,1)]
-        elif xy2 is 0:
-            xy = [(5**xy5, 1)]
-        elif xy5 is 0:
-            xy = [(2**xy2, 1)]
+        if xy2 is 1 or xy5 is 1:
+            xy = [(max(xy2, xy5),1)]
         else:
-            xy = [(2**xy2 * 5**xy5, 1), (5**xy5, 2**xy2)]
+            xy = [(xy2*xy5, 1), (xy5, xy2)]
 
         result = 0
         for (x, y) in xy:
