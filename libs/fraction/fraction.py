@@ -1,16 +1,22 @@
 #!/usr/bin/python
 
 def get_primes(N):
+    import math
     composites = set()
     primes = [2]
 
-    for p in range(3, N, 2):
+    sqrt_N = int(math.ceil(math.sqrt(N)))
+    sqrt_N |= 1 # make sure it is odd
+
+    for p in range(3, sqrt_N, 2):
         if p not in composites:
             primes.append(p)
 
             composites.update(range(p*p, N, 2*p))
 
+    primes += [p for p in range(sqrt_N, N, 2) if p not in composites]
     return primes
+
 
 class Factorer:
     def __init__(self):
