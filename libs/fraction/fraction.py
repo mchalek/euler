@@ -1,23 +1,18 @@
 #!/usr/bin/python
 
 def get_primes(N):
-    composites = [0l]*((N+127)/128)
+    composites = set()
     primes = [2]
 
     p = 3
     k = 0
     while p < N:
-        test_word = composites[k / 64]
-        test_bit = 1l << (k % 64)
-
-        if (test_word & test_bit) == 0:
+        if p not in composites:
             primes.append(p)
 
             q = 3*p
             while q < N:
-                test_idx = (q - 3) / 2
-                test_bit = 1l << (test_idx % 64)
-                composites[test_idx / 64] |= test_bit
+                composites.add(q)
                 q += 2*p
 
         k += 1
