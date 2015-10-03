@@ -58,15 +58,13 @@ int main()
     long sum_of_c = 0;
 
     for(a = 1; a < MAX_C; a++) {
+        long b_inc = (a & 1) ? 1 : 2;
         long b;
-        for(b = 1 + a; a + b < MAX_C; b++) {
+        for(b = 1 + a; a + b < MAX_C; b += b_inc) {
             if(!coprime(f + a, f + b))
                 continue;
 
             long c = a + b;
-
-            if(!coprime(f + a, f + c) || !coprime(f + b, f + c))
-                continue;
 
             // radicals factor since all are coprime
             if(rad(f+a)*rad(f+b)*rad(f+c) >= c)
