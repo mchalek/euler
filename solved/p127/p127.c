@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <prime.h>
 
-#define MAX_C 120000
+#define MAX_C 120000l
 
 typedef struct {
     long nf;
@@ -76,7 +76,7 @@ int main()
         }
     }
 
-    printf("sum_c == %ld\n", sum_of_c);
+    printf("%ld hits for c < %ld; sum_c == %ld\n", num_hits, MAX_C, sum_of_c);
 
     return 0;
 }
