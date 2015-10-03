@@ -7,9 +7,14 @@
 #define MAX(a, b) (((a) < (b)) ? (b) : (a))
 #define MIN(a, b) (((a) > (b)) ? (b) : (a))
 
+// only need factorials of 0 through 3, but look out if we try to experiment
+// with MAX_DIGIT_COUNT > 3!!
 int factorials[] = {1, 1, 2, 6};
 
 long count_permutations(int digits_used, int num_positions, int digit_counts[]) {
+    // count the number of ways to fill num_positions with the objects described
+    // by digit_counts.  This is the number of permutations, corrected for
+    // exchanges of identical elements
     int i, j;
 
     long result = 1;
@@ -25,6 +30,8 @@ long count_permutations(int digits_used, int num_positions, int digit_counts[]) 
 }
 
 long compute_variations(int digits_used, int digit_counts[]) {
+    // count the ways to assemble the prescribed digits into a unique
+    // number that does not start with 0.
     int i; // leading digit
 
     long result = 0;
@@ -78,8 +85,7 @@ long build() {
 
 int main()
 {
-    int digit_counts[10];
-    printf("result: %ld\n", build(0, 0, digit_counts));
+    printf("result: %ld\n", build());
 
     return 0;
 }
