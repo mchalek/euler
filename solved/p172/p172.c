@@ -29,37 +29,12 @@ long count_permutations(int digits_used, int num_positions, int digit_counts[]) 
     return result;
 }
 
-long compute_variations(int digits_used, int digit_counts[]) {
-    // count the ways to assemble the prescribed digits into a unique
-    // number that does not start with 0.
-    int i; // leading digit
-
-    long result = 0;
-    for(i = 1; i < digits_used; i++) {
-        if(!digit_counts[i])
-            continue;
-
-        digit_counts[i] -= 1;
-
-        result += count_permutations(digits_used, MAX_COUNT - 1, digit_counts);
-
-        digit_counts[i] += 1;
-    }
-
-    return result;
-}
-
 long _build(int count, int digit, int digit_counts[]) {
-    if(count == MAX_COUNT) {
-        int i;
-        for(i = 0; i < digit; i++) {
-            printf("%d ", digit_counts[i]);
-        }
-        long result = compute_variations(digit, digit_counts);
-        printf(" => %ld ways\n", result);
-
-        return result;
-    }
+    // Exhaust all possible digit counts, and add up the number of unique ways
+    // to arrange each set of counts.  Note that we allow leading 0's here, 
+    // so we must correct the total count in the calling method.
+    if(count == MAX_COUNT)
+        return count_permutations(digit, MAX_COUNT, digit_counts);
 
     long result = 0;
     // determine bounds on counts of this digit.  There are obvious upper limits,
@@ -80,7 +55,9 @@ long _build(int count, int digit, int digit_counts[]) {
 
 long build() {
     int digit_counts[10];
-    return _build(0, 0, digit_counts);
+    long with_leading_zeros = _build(0, 0, digit_counts);
+    // correct counts: exactly 90% do not start with 0
+    return with_leading_zeros / 10 * 9;
 }
 
 int main()
