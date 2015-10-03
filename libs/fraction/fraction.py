@@ -8,7 +8,7 @@ def get_primes(N):
         if p not in composites:
             primes.append(p)
 
-            composites.update(range(3*p, N, 2*p))
+            composites.update(range(p*p, N, 2*p))
 
     return primes
 
