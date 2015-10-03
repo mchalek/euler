@@ -4,9 +4,7 @@ def get_primes(N):
     composites = set()
     primes = [2]
 
-    p = 3
-    k = 0
-    while p < N:
+    for p in range(3, 1+N, 2):
         if p not in composites:
             primes.append(p)
 
@@ -14,9 +12,6 @@ def get_primes(N):
             while q < N:
                 composites.add(q)
                 q += 2*p
-
-        k += 1
-        p += 2
 
     return primes
 
