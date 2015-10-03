@@ -1,21 +1,27 @@
 #!/usr/bin/python
 
 def get_primes(N):
-    composites = set([])
+    composites = [0l]*((N+127)/128)
     primes = [2]
 
-    p = 1
+    p = 3
+    k = 0
     while p < N:
+        test_word = composites[k / 64]
+        test_bit = 1l << (k % 64)
+
+        if (test_word & test_bit) == 0:
+            primes.append(p)
+
+            q = 3*p
+            while q < N:
+                test_idx = (q - 3) / 2
+                test_bit = 1l << (test_idx % 64)
+                composites[test_idx / 64] |= test_bit
+                q += 2*p
+
+        k += 1
         p += 2
-        if p in composites:
-            continue
-
-        primes.append(p)
-
-        q = 2*p
-        while q < N:
-            composites.add(q)
-            q += p
 
     return primes
 
@@ -23,11 +29,14 @@ class Factorer:
     def __init__(self):
         self.max_prime = 10000000
         self.max_factor = self.max_prime**2
-        self.primes = get_primes(self.max_prime)
+        self.primes = None
 
     def factor(self, n):
         if n > self.max_factor:
             raise Exception('Cannot factor %d: too big!!' % n)
+
+        if self.primes is None:
+            self.primes = get_primes(self.max_prime)
 
         n0 = n
         factors = {}
