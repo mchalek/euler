@@ -2,7 +2,7 @@
 
 def get_primes(N):
     composites = set()
-    primes = [2,3]
+    primes = [2,3] # ignore multiples of 2 or 3 via loop definition
 
     for p in range(5, N, 6):
         if p not in composites:
@@ -17,7 +17,6 @@ def get_primes(N):
             composites.update(range(q*q, N, 2*q))
 
     return primes
-
 
 class Factorer:
     def __init__(self):
