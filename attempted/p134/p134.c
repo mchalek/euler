@@ -1,35 +1,84 @@
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include <prime.h>
 
-// can't just exhaust, need to build constructively
+#define MAX_C 120000
 
-int main()
+typedef struct {
+    long nf;
+    long factors[16];
+    long exponents[16];
+} factor_t;
+
+bool coprime(factor_t *a, factor_t *b)
 {
-    long *p, np;
+    int i = 0, j = 0;
 
-    primes(1000000, &p, &np);
+    while(i < a->nf && j < b->nf) {
+        if(a->factors[i] == b->factors[j])
+            return false;
 
-    long S = 0;
-
-    int i;
-    long modulus = 10;
-    // start i at 2 => p[i] == 5
-    for(i = 2; i < np - 1; i++) {
-        if(!(i % 1000))
-            printf("done with p[%d] == %ld\n", i-1, p[i-1]);
-        long pn = p[i];
-        long pn1 = p[i+1];
-        if(pn > modulus)
-            modulus *= 10;
-
-        long z = pn1;
-        while(z % modulus != pn) {
-            z += pn1;
-        }
-
-        S += z;
-        printf("solution for (%ld, %ld): %ld\n", pn, pn1, z);
+        if(a->factors[i] > b->factors[j])
+            j++;
+        else
+            i++;
     }
+
+    return true;
+}
+
+long rad(factor_t *a)
+{
+    long result = 1;
+    int i;
+    for(i = 0; i < a->nf; i++)
+        result *= a->factors[i];
+
+    return result;
+}
+
+int main() 
+{
+    long np;
+    long *p;
+    primes(MAX_C, &p, &np);
+
+    long a;
+
+    // do prime factorization of all possible values for (a, b, c)
+    factor_t *f = calloc(MAX_C, sizeof(factor_t));
+    for(a = 1; a < MAX_C; a++) {
+        factor(a, p, np, &f[a].nf, f[a].factors, f[a].exponents);
+    }
+
+    printf("Computed all factorizations.\n");
+
+    long num_hits = 0;
+    long sum_of_c = 0;
+
+    for(a = 1; a < MAX_C; a++) {
+        long b;
+        for(b = 1 + a; a + b < MAX_C; b++) {
+            if(!coprime(f + a, f + b))
+                continue;
+
+            long c = a + b;
+
+            if(!coprime(f + a, f + c) || !coprime(f + b, f + c))
+                continue;
+
+            // radicals factor since all are coprime
+            if(rad(f+a)*rad(f+b)*rad(f+c) >= c)
+                continue;
+
+            printf("ABC hit! (%ld, %ld, %ld)\n", a, b, c);
+            num_hits++;
+            sum_of_c += c;
+        }
+    }
+
+    printf("sum_c == %ld\n", sum_of_c);
 
     return 0;
 }
