@@ -4,14 +4,11 @@ def get_primes(N):
     composites = set()
     primes = [2]
 
-    for p in range(3, 1+N, 2):
+    for p in range(3, N, 2):
         if p not in composites:
             primes.append(p)
 
-            q = 3*p
-            while q < N:
-                composites.add(q)
-                q += 2*p
+            composites.update(range(3*p, N, 2*p))
 
     return primes
 
