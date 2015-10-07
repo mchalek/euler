@@ -8,7 +8,7 @@ from primes import get_primes
 
 NMAX = 100000000
 
-primes = get_primes(NMAX)
+primes = get_primes(NMAX/2)
 
 result = 0
 lastptr = -1

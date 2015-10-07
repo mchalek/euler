@@ -1,19 +1,21 @@
 
 def get_primes(N):
-    composites = set()
+    is_comp = [False for x in range((N+1)/2)]
     primes = [2,3] # ignore multiples of 2 or 3 via loop definition
 
     for p in range(5, N, 6):
-        if p not in composites:
+        if not is_comp[(p-1)/2]:
             primes.append(p)
 
-            composites.update(range(p*p, N, 2*p))
+            for r in range(p*p, N, 2*p):
+                is_comp[(r-1)/2] = True 
 
         q = p + 2
-        if q not in composites:
+        if not is_comp[(q-1)/2]:
             primes.append(q)
 
-            composites.update(range(q*q, N, 2*q))
+            for r in range(q*q, N, 2*q):
+                is_comp[(r-1)/2] = True
 
     return primes
 
