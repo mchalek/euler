@@ -5,7 +5,7 @@
 
 int main(void) {
     long np, *p;
-    primes(NMAX, &p, &np);
+    primes(NMAX/2, &p, &np);
 
     long lastptr = np-1;
 
