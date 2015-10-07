@@ -91,8 +91,14 @@ void primes(long N, long **p, long *k_out)
    (*p)[k++] = 2;
    (*p)[k++] = 3;
 
+   // avoid all multiples of 2 and 3 by skipping over them
    for(i = 5; i < uiN; i += 2) {
        int iter;
+       // do 2 iterations here, e.g. test 5 and 7 in the first iteration of
+       // the outer loop. Then outer loop incrementer skips the next integer
+       // (9 on the first iteration) because we know it's a multiple of 3.
+       // This doesn't save any more than a lookup into the cmp array, but
+       // it's still something.
        for(iter = 0; iter < 2; iter++, i += 2) {
            if(!iscmp(i, cmp)) {
                if(k == nalloc) {
