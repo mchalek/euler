@@ -1,7 +1,7 @@
 CFLAGS=-Wall -Wextra -O3 -g -I../../libs/primes/
 LDLIBS=-L../../libs/primes/ -lprime
 
-all: p134
+all: p127
 
 clean:
-	rm -f p134
+	rm -f p127

@@ -89,22 +89,32 @@ void primes(long N, long **p, long *k_out)
    long k = 0;
 
    (*p)[k++] = 2;
+   (*p)[k++] = 3;
 
-   for(i = 3; i < uiN; i += 2) {
-       if(!iscmp(i, cmp)) {
-           if(k == nalloc) {
-               nalloc <<= 1;
-               *p = realloc(*p, nalloc*sizeof(long));
-           }
-           (*p)[k++] = (long) i;
-           
-           // check for i^2 overflow
-           // not a problem because we're assured N fits in 64 bits
-           if(i > ((1ul << 32) - 1))
-               continue;
+   // avoid all multiples of 2 and 3 by skipping over them
+   for(i = 5; i < uiN; i += 2) {
+       int iter;
+       // do 2 iterations here, e.g. test 5 and 7 in the first iteration of
+       // the outer loop. Then outer loop incrementer skips the next integer
+       // (9 on the first iteration) because we know it's a multiple of 3.
+       // This doesn't save any more than a lookup into the cmp array, but
+       // it's still something.
+       for(iter = 0; iter < 2; iter++, i += 2) {
+           if(!iscmp(i, cmp)) {
+               if(k == nalloc) {
+                   nalloc <<= 1;
+                   *p = realloc(*p, nalloc*sizeof(long));
+               }
+               (*p)[k++] = (long) i;
+               
+               // check for i^2 overflow
+               // not a problem because we're assured N fits in 64 bits
+               if(i > ((1ul << 32) - 1))
+                   continue;
 
-           for(j = i*i; j < uiN; j += 2*i) {
-               setcmp(j, cmp);
+               for(j = i*i; j < uiN; j += 2*i) {
+                   setcmp(j, cmp);
+               }
            }
        }
    }
