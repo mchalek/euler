@@ -50,14 +50,17 @@ int execute() {
 
 
 int main(void) {
-    int i;
-    double sum = 0.0;
-    int num_trials = 10000000;
+    long sum = 0l;
+    long num_trials = 0l;
     srand(time(NULL));
-    for(i = 0; i < num_trials; i++) {
+    while(1) {
         sum += execute();
+        num_trials += 1;
+
+        if(!(num_trials % 1000000)) {
+            printf("after %ld iterations: %.6f\n", num_trials, ((double) sum) / num_trials);
+        }
     }
-    printf("mean by shitty simulation: %.6f\n", sum / num_trials);
     
     return 0;
 }
