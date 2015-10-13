@@ -37,40 +37,34 @@ case class Config(counts: IndexedSeq[Int], singleSheets: Int) {
 
     result
   }
-}
 
-@tailrec def dive(nodes: Map[Config, Double]): Map[Config, Double] = {
-  // input should be a probability distribution over configurations at the
-  // current iteration.  normalization is necessary at each level to prevent
-  // underflows
-  if(nodes.keys.forall(_.isFinal)) {
-    return nodes
-  }
-
-  val newNodes = collection.mutable.Buffer.empty[(Config, Double)]
-  nodes.foreach { case (cfg, wsum) =>
-    cfg.draw.foreach {
-      case (newCfg, prob) =>
-        newNodes += ((newCfg -> (wsum * prob)))
-    }
-  }
-
-  // must renormalize because the transformation above has norm > 1
-  var total = 0d
-  val grouped = newNodes.toSeq.groupBy { case (cfg, _) => cfg }.map { 
-      case (key, values) => 
-        val x = values.unzip._2.sum
-        total += x
-        (key, x)
+  def getTerminalProbabilities = {
+    @tailrec def dive(nodes: Map[Config, Double]): Map[Config, Double] = {
+      if(nodes.keys.forall(_.isFinal)) {
+        return nodes
       }
 
-  dive(grouped.map { case (k, v) => k -> (v / total) })
+      val newNodes = collection.mutable.Buffer.empty[(Config, Double)]
+      nodes.foreach { case (cfg, wsum) =>
+        cfg.draw.foreach {
+          case (newCfg, prob) =>
+            newNodes += ((newCfg -> (wsum * prob)))
+        }
+      }
+
+      val grouped = newNodes.toSeq.groupBy { case (cfg, _) => cfg }.map { 
+          case (key, values) => (key, values.unzip._2.sum)
+        }
+
+      dive(grouped)
+    }
+    dive(Map(this -> 1d))
+  }
 }
 
-val initialNodes = Map(Config(IndexedSeq(1,1,1,1), 0) -> 1d)
-val result = dive(initialNodes)
+val probabilities = Config(IndexedSeq(1,1,1,1), 0).getTerminalProbabilities
 
 var E = 0d
-result.foreach { case (cfg, prob) => E += prob * cfg.singleSheets }
+probabilities.foreach { case (cfg, prob) => E += prob * cfg.singleSheets }
 
 println(s"result: $E ~ %.6f".format(E))
