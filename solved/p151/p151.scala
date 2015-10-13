@@ -1,13 +1,14 @@
 import scala.annotation.tailrec
 
 val cuts = IndexedSeq(
-  IndexedSeq(-1, 1, 1, 1), // increment when choosing A2
-  IndexedSeq(0, -1, 1, 1), // increment when choosing A3
-  IndexedSeq(0, 0, -1, 1), // increment when choosing A4
-  IndexedSeq(0, 0, 0, -1)) // increment when choosing A5
+  IndexedSeq(-1, 1, 1, 1, 1), // increment when choosing A1
+  IndexedSeq(0, -1, 1, 1, 1), // increment when choosing A2
+  IndexedSeq(0, 0, -1, 1, 1), // increment when choosing A3
+  IndexedSeq(0, 0, 0, -1, 1), // increment when choosing A4
+  IndexedSeq(0, 0, 0, 0, -1)) // increment when choosing A5
 
 case class Config(counts: IndexedSeq[Int], singleSheets: Int) {
-  require(counts.length == 4, "Too many counts!")
+  require(counts.length == 5, "Too many counts!")
   require(counts.forall(_ >= 0), "Negative count not allowed!" + counts.toString)
 
   val isFinal = counts.sum == 1 && counts.last == 1
@@ -62,7 +63,7 @@ case class Config(counts: IndexedSeq[Int], singleSheets: Int) {
   }
 }
 
-val probabilities = Config(IndexedSeq(1,1,1,1), 0).getTerminalProbabilities
+val probabilities = Config(IndexedSeq(1,0,0,0,0), 0).getTerminalProbabilities
 
 var E = 0d
 probabilities.foreach { case (cfg, prob) => E += prob * cfg.singleSheets }
