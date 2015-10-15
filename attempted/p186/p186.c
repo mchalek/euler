@@ -112,12 +112,12 @@ void propagate(int caller, uint64_t *is_friend, user_t *calls) {
 
 int main(void) {
     uint64_t *is_friend = calloc((MODULUS+63) / 64, sizeof(uint64_t));
-    is_friend[PM_NUM / 64] |= 1ul << (PM_NUM % 64); // PM is self-friend already
+    set_if_not(PM_NUM, is_friend); // PM is his only friend at first
 
     user_t *calls = calloc(MODULUS, sizeof(user_t));
 
-    int network_size = 0;
-    int connected = 0;
+    int network_size = 1000000;
+    int connected = count_connected(is_friend);
     int num_calls = 0;
     do {
         uint64_t this_call = next_call();
@@ -130,7 +130,7 @@ int main(void) {
 
         num_calls++;
 
-        network_size += insert(caller0, caller1, calls);
+        insert(caller0, caller1, calls);
 
         bool c0_in_net = in_pm_net(caller0, is_friend);
         bool c1_in_net = in_pm_net(caller1, is_friend);
@@ -148,7 +148,6 @@ int main(void) {
         }
 
         connected = count_connected(is_friend);
-
     } while(connected * 100 < network_size * 99);
 
     printf("99%% coverage after %d calls!\n", num_calls);
