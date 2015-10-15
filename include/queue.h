@@ -30,12 +30,15 @@ static bool enqueue(void *item, queue_t *q) {
     payload_t *node = malloc(sizeof(payload_t));
     node->item = malloc(q->item_size);
     memcpy(node->item, item, q->item_size);
+
     node->next = NULL;
     node->prev = q->tail;
 
     if(NULL == q->tail) {
-        if(NULL != q->head)
+        if(NULL != q->head) {
+            exit(10);
             return false;
+        }
 
         q->head = node;
         q->tail = node;
@@ -49,17 +52,22 @@ static bool enqueue(void *item, queue_t *q) {
 }
 
 static bool dequeue(void *item, queue_t *q) {
-    if(q->head == NULL)
+    if(q->head == NULL) {
         return false;
+    }
 
     // allow dequeue to null target
     if(item != NULL)
         memcpy(item, q->head->item, q->item_size);
 
     payload_t *node = q->head;
+    
     q->head = q->head->next;
-    if(NULL != q->head)
+    if(NULL != q->head) {
         q->head->prev = NULL;
+    } else {
+        q->tail = NULL;
+    }
 
     free(node->item);
     free(node);
