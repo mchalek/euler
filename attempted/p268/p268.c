@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// NOTE TO SELF: this approach is completely useless!  must account for use
+// of primes > 100 in conjunction with some below 100
+
 //#define MAX_N 10000000000000000L
 #define MAX_N 1000
 
