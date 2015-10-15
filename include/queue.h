@@ -16,7 +16,7 @@ typedef struct {
     payload_t *head, *tail;
 } queue_t;
 
-bool init(int item_size, queue_t *q) {
+static bool queue_init(int item_size, queue_t *q) {
     q->item_size = item_size;
     q->num_items = 0;
     q->head = NULL;
@@ -25,7 +25,7 @@ bool init(int item_size, queue_t *q) {
     return true;
 }
 
-bool enqueue(void *item, queue_t *q) {
+static bool enqueue(void *item, queue_t *q) {
     payload_t *node = malloc(sizeof(payload_t));
     node->item = malloc(q->item_size);
     memcpy(node->item, item, q->item_size);
@@ -47,7 +47,7 @@ bool enqueue(void *item, queue_t *q) {
     return true;
 }
 
-bool dequeue(void *item, queue_t *q) {
+static bool dequeue(void *item, queue_t *q) {
     if(q->head == NULL)
         return false;
 
@@ -67,11 +67,11 @@ bool dequeue(void *item, queue_t *q) {
     return true;
 }
 
-bool isempty(queue_t *q) {
+static bool queue_isempty(queue_t *q) {
     return q->num_items == 0;
 }
 
-bool cleanup(queue_t *q) {
+static bool queue_cleanup(queue_t *q) {
     while(dequeue(NULL, q));
 
     q->item_size = 0;

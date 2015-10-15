@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <kmbits.h>
+#include <queue.h>
 
 #define PM_NUM 524287
 #define MODULUS 1000000
