@@ -46,6 +46,7 @@ static bool enqueue(void *item, queue_t *q) {
         q->tail = node;
     } else {
         q->tail->next = node;
+        q->tail = node;
     }
 
     q->num_items++;
