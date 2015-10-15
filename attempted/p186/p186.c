@@ -86,7 +86,28 @@ int count_connected(uint64_t *words) {
 }
 
 void propagate(int caller, uint64_t *is_friend, user_t *calls) {
-    // do a BFS
+    // do a queue-based BFS
+    set_if_not(caller, is_friend);
+
+    queue_t q;
+    queue_init(sizeof(int), &q);
+    enqueue(&caller, &q);
+
+    //fprintf(stderr, "Inside propagate()...");
+    int user;
+    while(dequeue(&user, &q)) {
+        int i;
+        for(i = 0; i < calls[user].num_calls; i++) {
+            int friend = calls[user].called[i];
+            if(set_if_not(friend, is_friend)) {
+                // enqueue any friend who was not previously in PM network
+                enqueue(&friend, &q);
+            }
+        }
+    }
+
+    queue_cleanup(&q);
+    //fprintf(stderr, "DONE\n");
 }
 
 int main(void) {
@@ -114,6 +135,9 @@ int main(void) {
         bool c0_in_net = in_pm_net(caller0, is_friend);
         bool c1_in_net = in_pm_net(caller1, is_friend);
 
+        if(!(num_calls % 100000))
+            printf("%d / %d connected after %d calls\n", connected, network_size, num_calls);
+
         if(!(c0_in_net ^ c1_in_net)) 
             continue;
 
@@ -124,6 +148,7 @@ int main(void) {
         }
 
         connected = count_connected(is_friend);
+
     } while(connected * 100 < network_size * 99);
 
     printf("99%% coverage after %d calls!\n", num_calls);
