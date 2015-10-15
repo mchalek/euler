@@ -69,6 +69,8 @@ int count_connected(uint64_t *words) {
     for(i = 0; i < num_words; i++) {
         ret += _popcnt(words[i]);
     }
+
+    return ret;
 }
 
 int main(void) {
@@ -79,6 +81,7 @@ int main(void) {
 
     int network_size = 0;
     int connected = 0;
+    int num_calls = 0;
     do {
         uint64_t this_call = next_call();
     
@@ -87,6 +90,8 @@ int main(void) {
 
         if(caller0 == caller1)
             continue;
+
+        num_calls++;
 
         network_size += insert(caller0, caller1, calls);
 
@@ -105,7 +110,7 @@ int main(void) {
         connected = count_connected(is_friend);
     } while(connected * 100 < network_size * 99);
 
-    printf("99% coverage after %d calls!\n", num_calls);
+    printf("99%% coverage after %d calls!\n", num_calls);
     printf("%d connected out of %d users\n", connected, network_size);
 
     return 0;
