@@ -56,9 +56,20 @@ int insert(int caller0, int caller1, user_t *calls) {
 
 bool in_pm_net(int caller, uint64_t *is_friend) {
     int word = caller / 64;
-    int bit = 1ul << (caller % 64);
+    uint64_t bit = 1ul << (caller % 64);
 
     return is_friend[word] & bit;
+}
+
+bool set_if_not(int caller, uint64_t *is_friend) {
+    int word = caller / 64;
+    uint64_t bit = 1ul << (caller % 64);
+
+    bool state = is_friend[word] & bit;
+
+    is_friend[word] |= bit;
+
+    return state;
 }
 
 int count_connected(uint64_t *words) {
@@ -71,6 +82,10 @@ int count_connected(uint64_t *words) {
     }
 
     return ret;
+}
+
+void propagate(int caller, uint64_t *is_friend, user_t *calls) {
+    // do a BFS
 }
 
 int main(void) {
