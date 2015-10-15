@@ -48,10 +48,16 @@ typedef struct {
     int called[255];
 } user_t;
 
+void append_user(int caller, user_t *user)
+{
+    int prev_count = user->num_calls++;
+    user->called[prev_count] = caller;
+}
+
 int insert(int caller0, int caller1, user_t *calls) {
     int num_new_users = !calls[caller0].num_calls + !calls[caller1].num_calls;
-    calls[caller0].called[calls[caller0].num_calls++] = caller1;
-    calls[caller1].called[calls[caller1].num_calls++] = caller0;
+    append_user(caller0, calls + caller1);
+    append_user(caller1, calls + caller0);
 
     return num_new_users;
 }
@@ -96,15 +102,28 @@ void propagate(int caller, uint64_t *is_friend, user_t *calls) {
 
     //fprintf(stderr, "Inside propagate()...");
     int user;
+    int depth = 1;
+    int passes = 0;
+    int mqs = 1;
     while(dequeue(&user, &q)) {
+        passes++;
         int i;
         for(i = 0; i < calls[user].num_calls; i++) {
             int friend = calls[user].called[i];
-            if(set_if_not(friend, is_friend)) {
+            if(!set_if_not(friend, is_friend)) {
                 // enqueue any friend who was not previously in PM network
                 enqueue(&friend, &q);
             }
+
+            mqs = (q.num_items > mqs) ? (q.num_items) : mqs;
         }
+    }
+
+    //if(passes > calls[caller].num_calls) {
+    if(mqs > 1) {
+        printf("user calls: %d\n", calls[caller].num_calls);
+        printf("depth: %d; passes: %d; max queue size: %d\n", depth, passes, mqs);
+        printf("terminal queue size: %d\n", q.num_items);
     }
 
     queue_cleanup(&q);
@@ -149,7 +168,7 @@ int main(void) {
         }
 
         connected = count_connected(is_friend);
-    } while(connected * 100 < network_size * 99);
+    } while(connected < (network_size * 99) / 100);
 
     printf("99%% coverage after %d calls!\n", num_calls);
     printf("%d connected out of %d users\n", connected, network_size);
