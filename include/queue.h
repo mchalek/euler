@@ -1,6 +1,7 @@
 #ifndef __QUEUE_H__
 #define __QUEUE_H__
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -36,6 +37,7 @@ static bool enqueue(void *item, queue_t *q) {
 
     if(NULL == q->tail) {
         if(NULL != q->head) {
+            fprintf(stderr, "[ERROR] queue state is invalid!\n");
             exit(10);
             return false;
         }
@@ -66,6 +68,7 @@ static bool dequeue(void *item, queue_t *q) {
     if(NULL != q->head) {
         q->head->prev = NULL;
     } else {
+        // we have emptied the queue
         q->tail = NULL;
     }
 
