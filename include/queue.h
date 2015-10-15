@@ -57,8 +57,9 @@ static bool dequeue(void *item, queue_t *q) {
         memcpy(item, q->head->item, q->item_size);
 
     payload_t *node = q->head;
-    q->head = node->next;
-    q->head->prev = NULL;
+    q->head = q->head->next;
+    if(NULL != q->head)
+        q->head->prev = NULL;
 
     free(node->item);
     free(node);
