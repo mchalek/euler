@@ -104,7 +104,6 @@ void propagate(int caller, uint64_t *is_friend, user_t *calls) {
     int user;
     int depth = 1;
     int passes = 0;
-    int mqs = 1;
     while(dequeue(&user, &q)) {
         passes++;
         int i;
@@ -114,16 +113,11 @@ void propagate(int caller, uint64_t *is_friend, user_t *calls) {
                 // enqueue any friend who was not previously in PM network
                 enqueue(&friend, &q);
             }
-
-            mqs = (q.num_items > mqs) ? (q.num_items) : mqs;
         }
     }
 
-    //if(passes > calls[caller].num_calls) {
-    if(mqs > 1) {
-        printf("user calls: %d\n", calls[caller].num_calls);
-        printf("depth: %d; passes: %d; max queue size: %d\n", depth, passes, mqs);
-        printf("terminal queue size: %d\n", q.num_items);
+    if(q->num_items != 0) {
+        printf("RUH ROH\n");
     }
 
     queue_cleanup(&q);
