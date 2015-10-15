@@ -2,12 +2,13 @@
 #define __QUEUE_H__
 
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 
 typedef struct _payload_t {
     void *item;
-    _payload_t *next;
-    _payload_t *prev;
+    struct _payload_t *next;
+    struct _payload_t *prev;
 } payload_t;
 
 typedef struct {
