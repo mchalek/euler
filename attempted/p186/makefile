@@ -4,3 +4,4 @@ all: p186
 
 clean:
 	rm -f p186
+	rm -rf *.dSYM

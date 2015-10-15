@@ -116,7 +116,7 @@ void propagate(int caller, uint64_t *is_friend, user_t *calls) {
         }
     }
 
-    if(q->num_items != 0) {
+    if(q.num_items != 0) {
         printf("RUH ROH\n");
     }
 
