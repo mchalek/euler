@@ -17,6 +17,7 @@ int next_int(void) {
         long k3 = (k*k*k) % MODULUS;
         int result = (100003 - 200003*k + 300007*k3) % MODULUS;
         S[read++] = result;
+        read %= 55;
         return result;
     } else {
         int read_minus_24 = (read + 55 - 24) % 55;
