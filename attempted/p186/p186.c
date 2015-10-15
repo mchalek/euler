@@ -100,12 +100,8 @@ void propagate(int caller, uint64_t *is_friend, user_t *calls) {
     queue_init(sizeof(int), &q);
     enqueue(&caller, &q);
 
-    //fprintf(stderr, "Inside propagate()...");
     int user;
-    int depth = 1;
-    int passes = 0;
     while(dequeue(&user, &q)) {
-        passes++;
         int i;
         for(i = 0; i < calls[user].num_calls; i++) {
             int friend = calls[user].called[i];
@@ -116,12 +112,7 @@ void propagate(int caller, uint64_t *is_friend, user_t *calls) {
         }
     }
 
-    if(q.num_items != 0) {
-        printf("RUH ROH\n");
-    }
-
     queue_cleanup(&q);
-    //fprintf(stderr, "DONE\n");
 }
 
 int main(void) {
