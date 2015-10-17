@@ -69,13 +69,22 @@ class Fraction:
         else:
             numerator = self.prod(self.fn)
 
-        denominator = self.prod(self.fd)
+        denominator = self.prod(self.fd) if numerator != 0 else 0
 
         return (numerator, denominator)
+
+    def clone(self):
+        return Fraction(self.fn, self.fd, self.negative)
 
     def __add__(self, that):
         if type(that) == int:
             return self.__add__(Fraction(that, 1))
+
+        if self == 0:
+            return that.clone()
+
+        if that == 0:
+            return self.clone()
         
         new_fd = self.factored_multiply(self.fd, that.fd)
 
