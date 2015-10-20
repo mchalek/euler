@@ -17,7 +17,7 @@
  * 2 a^2 == h (h*(r-1) - 2a).
  *
  * So we know that either h divides 2 or h divides a.
- * The former case is easy, h divides 2 => h == 2.
+ * The former case is easy, h divides 2 => h == 1 or 2.
  *
  * The latter case implies:
  *   a = h*s, so
