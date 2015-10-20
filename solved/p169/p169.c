@@ -11,12 +11,21 @@
 // 011111112
 //
 // so there are N places to put a 2, and 1 place to put the 1
-// note that after the 2, we always have all-zeros.  We should be able
-// to do some kind of dynamic programming thing whereby we keep track of
-// the possible values of each exponent as we add in more powers, going
-// from high to low.
+// note that after the 2, we always have all-zeros.
 
 /*
+To solve, we start from the smallest power (which has p+1 possible
+representations) and then continually add bigger powers.  With each addition,
+we just have to keep track of the number of ways to include the representation
+of the new power alongside the old ones.  This comes down to how many ways
+we can insert the terminal 2 in one of the representations of the new power.
+Note that there are p_new - p_old ways to place that 2 to the left of the
+previously-highest power, all of which accept all valid representations of 
+N_old alone.  However once we try to place the 2 for p_new at or beyond
+p_old, we have to account for what this does.  If the 2 for p_new is placed
+beyond p_old, then we can only recognize one representation of p_old, i.e.
+the one with a 1 at p_old.
+
 8 + 2:
 
 1 0 1 0 ==
