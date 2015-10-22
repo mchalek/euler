@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+// relatively simple: collect set of valid rows, then compute valid 
+// transitions between rows. Finally, assemble counts via dynamic programming
+
 #define WIDTH 32
 #define HEIGHT 10
 
