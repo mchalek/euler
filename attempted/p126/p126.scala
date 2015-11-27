@@ -122,6 +122,12 @@ class Solid(cubes: Seq[Cube]) {
   override def toString = {
     cubes.mkString(";")
   }
+
+  def copy = {
+    val copyCubes = cubes.map(f => f)
+
+    new Solid(copyCubes)
+  }
 }
 
 object Solid {
@@ -157,74 +163,58 @@ object Solid {
   }
 }
 
-val MAX_N = 1600
-val counts = mutable.Map.empty[Int, Int]
-var x = 1
-var solid = Solid(1,1,1)
+def log(counts: Map[Int, Int]) {
+  val test_values = Seq(22, 46, 78, 118,154)
+  test_values.foreach { value =>
+    println(s"C($value) == ${counts.getOrElse(value, 0)}")
+  }
 
-var done = mutable.Set.empty[(Int, Int, Int)]
+  println(s"Max C: ${counts.values.toSeq.max}")
+}
 
-var skipped = 0
-var numTested = 0
+def solveIt(maxN: Int): Unit = {
+  val counts = mutable.Map.empty[Int, Int]
 
-while(solid.volume <= MAX_N) {
-  var y = 1
-  while(y <= x && solid.volume <= MAX_N) {
+  var y = 0
+  while(true) {
+    y += 1
+
+    val minVolume = Solid(y, y, 1).nextLayer.volume
+    if(minVolume > maxN) {
+      log(counts.toMap)
+      return
+    }
+
     var z = 1
-    while(z <= y && solid.volume <= MAX_N) {
-      //println(s"Solid ($x, $y, $z) => ${solid.volume}")
-      val size = (x, y, z)
-      numTested += 1
-        
-      if(!done.contains(size)) {
-        var layer = 0
-        val layerVolumes = mutable.Buffer.empty[Int]
-        while(solid.volume < MAX_N) {
-          if(layer > 0) {
-            layerVolumes += solid.volume
-          }
+    var baseSolid = Solid(y, y, z)
+    var baseVolume = baseSolid.nextLayer.volume
 
-          layer += 1
-          solid = solid.nextLayer
+    while(z <= y && baseVolume <= maxN) {
+      var incSolid = Solid(y+1, y, z)
+      var increment = incSolid.nextLayer.volume - baseVolume
+
+      while(baseVolume <= maxN) {
+        var volume = baseVolume
+        var x = y
+        while(volume <= maxN) {
+          println(s"Doing ($x, $y, $z)")
+          counts.getOrElseUpdate(volume, 0)
+          counts(volume) += 1
+
+          volume += increment
+          x += 1
         }
 
-        var multiple = 1
-        var multiple3 = 1
-        while(layerVolumes.headOption.map(v => v*multiple3 < MAX_N).getOrElse(false)) {
-          val scaledSize = (x*multiple, y*multiple, z*multiple)
-          done += scaledSize
+        baseSolid = baseSolid.nextLayer
+        baseVolume = baseSolid.nextLayer.volume
 
-          layerVolumes.foreach { vol => 
-            val scaledVolume = vol * multiple3
-            if(scaledVolume <= MAX_N) {
-              val prevCount = counts.getOrElse(scaledVolume, 0)
-              counts += (scaledVolume -> (1 + prevCount))
-            }
-          }
-          multiple += 1
-          multiple3 = multiple*multiple*multiple
-        }
-      } else {
-        skipped += 1
+        incSolid = incSolid.nextLayer
+        increment = incSolid.nextLayer.volume - baseVolume
       }
 
       z += 1
-      solid = Solid(x, y, z)
+      baseSolid = Solid(y, y, z)
+      baseVolume = baseSolid.nextLayer.volume
     }
-
-    y += 1
-    solid = Solid(x, y, 1)
   }
-
-  x += 1
-  solid = Solid(x, 1, 1)
 }
-
-println(s"Skipped $skipped / $numTested solids")
-
-val test_values = Seq(22,46, 78, 118,154)
-test_values.foreach { value =>
-  println(s"C($value) == ${counts.getOrElse(value, 0)}")
-}
-
-println(s"Max C: ${counts.values.toSeq.max}")
