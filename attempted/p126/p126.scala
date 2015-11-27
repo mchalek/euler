@@ -177,7 +177,7 @@ def log(counts: Map[Int, Int]) {
 }
 
 def solveIt(maxN: Int): Unit = {
-  val counts = mutable.Map.empty[Int, Int]
+  val counts = Array.fill(1+maxN)(0)
 
   var y = 0
   while(true) {
@@ -185,7 +185,7 @@ def solveIt(maxN: Int): Unit = {
 
     val minVolume = Solid(y, y, 1).nextLayer.volume
     if(minVolume > maxN) {
-      log(counts.toMap)
+      log(counts.zipWithIndex.map { case (count, ind) => (ind, count) }.toMap)
       return
     }
 
@@ -205,7 +205,6 @@ def solveIt(maxN: Int): Unit = {
         var volume = baseVolume
         var x = y
         while(volume <= maxN) {
-          counts.getOrElseUpdate(volume, 0)
           counts(volume) += 1
 
           volume += increment
