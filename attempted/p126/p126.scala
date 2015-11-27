@@ -106,10 +106,10 @@ object Solid {
   }
 }
 
-val MAX_N = 200
+val MAX_N = 400
 val counts = mutable.Map.empty[Int, Int]
 var x = 0
-while(x <= 40) {
+while(x <= 200) {
   x += 1
   var y = 1
   while(y <= x) {
@@ -140,3 +140,5 @@ val test_values = Seq(22,46, 78, 118,154)
 test_values.foreach { value =>
   println(s"C($value) == ${counts.getOrElse(value, 0)}")
 }
+
+println(s"Max C: ${counts.values.toSeq.max}")
