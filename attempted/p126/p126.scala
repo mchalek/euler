@@ -198,11 +198,12 @@ def solveIt(maxN: Int): Unit = {
       var incNext = incSolid.nextLayer
       var increment = incNext.volume - baseVolume
 
+      println(s"Working on (y/z) == ($y, $z)")
+
       while(baseVolume <= maxN) {
         var volume = baseVolume
         var x = y
         while(volume <= maxN) {
-          println(s"Doing ($x, $y, $z)")
           counts.getOrElseUpdate(volume, 0)
           counts(volume) += 1
 
