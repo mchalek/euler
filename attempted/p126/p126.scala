@@ -1,6 +1,6 @@
 import collection.mutable
 
-class Cube(coords: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(false)) {
+class Cube(val coords: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(false)) {
   require(faceCovered.length == 6, "Invalid faceCovered specification!  Must have 6 entries")
 
   val _faceCovered = faceCovered.toArray
@@ -9,10 +9,9 @@ class Cube(coords: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(fals
     _faceCovered(ind) = true
   }
 
-  def x = coords._1
-  def y = coords._2
-  def z = coords._3
-
+  lazy val x = coords._1
+  lazy val y = coords._2
+  lazy val z = coords._3
 
   def coverLayer = {
     val result = mutable.Buffer.empty[Cube]
@@ -34,6 +33,8 @@ class Cube(coords: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(fals
     if(!_faceCovered(5)) {
       result += new Cube((x - 1, y, z), Seq(true, false, false, false, false, false))
     }
+
+    //println(s"""From cube ${this}, generating: ${result.mkString(";")}""")
 
     result.toSeq
   }
@@ -62,26 +63,27 @@ class Cube(coords: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(fals
 
     this
   }
+
+  def applyCoverFromCoordSet(coordSet: Set[(Int, Int, Int)]) {
+    if(coordSet.contains((x + 1, y, z))) setCover(0)
+    if(coordSet.contains((x, y, z + 1))) setCover(1)
+    if(coordSet.contains((x, y + 1, z))) setCover(2)
+    if(coordSet.contains((x, y, z - 1))) setCover(3)
+    if(coordSet.contains((x, y - 1, z))) setCover(4)
+    if(coordSet.contains((x - 1, y, z))) setCover(5)
+  }
 }
 
 object CubeHelper {
   def merge(cubes: Seq[Cube]): Seq[Cube] = {
-    val (cubeCoords, layer) = cubes.groupBy(cube => (cube.x, cube.y, cube.z)).toSeq.map { 
+    val (cubeCoords, layer) = cubes.groupBy(cube => cube.coords).toSeq.map { 
       case (coord, cubes) =>
         (coord, cubes.reduce(_+_))
     }.unzip
 
     val cubeCoordSet = cubeCoords.toSet
 
-    layer.toSeq.foreach { cube =>
-      val (x, y, z) = (cube.x, cube.y, cube.z)
-      if(cubeCoordSet.contains((x + 1, y, z))) cube.setCover(0)
-      if(cubeCoordSet.contains((x, y, z + 1))) cube.setCover(1)
-      if(cubeCoordSet.contains((x, y + 1, z))) cube.setCover(2)
-      if(cubeCoordSet.contains((x, y, z - 1))) cube.setCover(3)
-      if(cubeCoordSet.contains((x, y - 1, z))) cube.setCover(4)
-      if(cubeCoordSet.contains((x - 1, y, z))) cube.setCover(5)
-    }
+    layer.toSeq.foreach(_.applyCoverFromCoordSet(cubeCoordSet))
 
     layer
   }
@@ -103,16 +105,12 @@ class Solid(cubes: Seq[Cube]) {
 }
 
 object Solid {
-  def isCovered(value: Int, lowerUpper: Boolean, N: Int) = {
-    if(N == 1)
-      false
-    else {
-      if(!lowerUpper) {
-        value == 0
-      } else { 
-        value == N-1
-      }
-    }
+  def markCovered(cubes: Seq[Cube]) = {
+    val cubeCoordSet = cubes.map(_.coords).toSet
+
+    cubes.foreach(_.applyCoverFromCoordSet(cubeCoordSet))
+
+    cubes
   }
 
   def apply(nx: Int, ny: Int, nz: Int) = {
@@ -122,12 +120,10 @@ object Solid {
       y <- 0 until ny
       z <- 0 until nz
     } {
-      val covered = Seq(isCovered(x, false, nx), isCovered(z, false, nz), isCovered(y, false, ny),
-        isCovered(z, true, nz), isCovered(y, true, ny), isCovered(x, true, nx))
-      cubes += new Cube((x, y, z), covered)
+      cubes += new Cube((x, y, z))
     }
 
-    new Solid(cubes.toSeq)
+    new Solid(markCovered(cubes.toSeq))
   }
 }
 
