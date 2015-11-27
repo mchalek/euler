@@ -191,7 +191,8 @@ def solveIt(maxN: Int): Unit = {
 
     var z = 1
     var baseSolid = Solid(y, y, z)
-    var baseVolume = baseSolid.nextLayer.volume
+    var baseNext = baseSolid.nextLayer
+    var baseVolume = baseNext.volume
 
     while(z <= y && baseVolume <= maxN) {
       var incSolid = Solid(y+1, y, z)
@@ -211,8 +212,9 @@ def solveIt(maxN: Int): Unit = {
           x += 1
         }
 
-        baseSolid = baseSolid.nextLayer
-        baseVolume = baseSolid.nextLayer.volume
+        baseSolid = baseNext
+        baseNext = baseSolid.nextLayer
+        baseVolume = baseNext.volume
 
         incSolid = incNext
         incNext = incSolid.nextLayer
@@ -221,7 +223,8 @@ def solveIt(maxN: Int): Unit = {
 
       z += 1
       baseSolid = Solid(y, y, z)
-      baseVolume = baseSolid.nextLayer.volume
+      baseNext = baseSolid.nextLayer
+      baseVolume = baseNext.volume
     }
   }
 }
