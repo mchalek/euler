@@ -157,7 +157,6 @@ object Solid {
   }
 }
 
-/*
 val MAX_N = 200
 val counts = mutable.Map.empty[Int, Int]
 var x = 1
@@ -197,4 +196,3 @@ test_values.foreach { value =>
 }
 
 println(s"Max C: ${counts.values.toSeq.max}")
-*/
