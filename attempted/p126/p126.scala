@@ -119,15 +119,17 @@ while(x <= 40) {
       //println(s"Solid ($x, $y, $z) => ${solid.outerLayer}")
       var layer = 0
       while(solid.outerLayer < MAX_N) {
-        val prev_count = counts.getOrElseUpdate(solid.outerLayer, 0)
-        counts(solid.outerLayer) += 1
+        if(layer > 0) {
+          val prev_count = counts.getOrElseUpdate(solid.outerLayer, 0)
+          counts(solid.outerLayer) += 1
 
-        layer += 1
-        if(78 == solid.outerLayer) {
-          println(s"    Layer $layer ($x, $y, $z) => ${solid.outerLayer}")
-          println(s"Incrementing from $prev_count to ${1 + prev_count} => ${counts(78)}")
+          if(78 == solid.outerLayer) {
+            println(s"    Layer $layer ($x, $y, $z) => ${solid.outerLayer}")
+            println(s"Incrementing from $prev_count to ${1 + prev_count} => ${counts(78)}")
+          }
         }
 
+        layer += 1
         solid = solid.nextLayer
       }
 
