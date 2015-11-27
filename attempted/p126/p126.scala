@@ -122,12 +122,6 @@ class Solid(cubes: Seq[Cube]) {
   override def toString = {
     cubes.mkString(";")
   }
-
-  def copy = {
-    val copyCubes = cubes.map(f => f)
-
-    new Solid(copyCubes)
-  }
 }
 
 object Solid {
