@@ -106,15 +106,14 @@ object Solid {
   }
 }
 
-val MAX_N = 400
+val MAX_N = 1600
 val counts = mutable.Map.empty[Int, Int]
-var x = 0
-while(x <= 200) {
-  x += 1
+var x = 1
+var solid = Solid(1,1,1)
+while(solid.outerLayer <= MAX_N) {
   var y = 1
-  while(y <= x) {
+  while(y <= x && solid.outerLayer <= MAX_N) {
     var z = 1
-    var solid = Solid(x, y, z)
     while(z <= y && solid.outerLayer <= MAX_N) {
       //println(s"Solid ($x, $y, $z) => ${solid.outerLayer}")
       var layer = 0
@@ -133,7 +132,11 @@ while(x <= 200) {
     }
 
     y += 1
+    solid = Solid(x, y, 1)
   }
+
+  x += 1
+  solid = Solid(x, 1, 1)
 }
 
 val test_values = Seq(22,46, 78, 118,154)
