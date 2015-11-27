@@ -114,8 +114,9 @@ class Solid(cubes: Seq[Cube]) {
   def nextLayer = {
     val nextCubes = cubes.flatMap(_.coverLayer)
     val merged = CubeHelper.merge(nextCubes)
+    val filtered = CubeHelper.filterQuadrant(merged)
 
-    new Solid(merged)
+    new Solid(filtered)
   }
 
   override def toString = {
