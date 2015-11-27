@@ -91,10 +91,25 @@ object CubeHelper {
 
     layer
   }
+
+  def filterQuadrant(cubes: Seq[Cube]) = {
+    cubes.filter(cube => cube.coords._1 >= 0 && cube.coords._2 >= 0 && cube.coords._3 >= 0)
+  }
 }
 
 class Solid(cubes: Seq[Cube]) {
-  def volume = cubes.length
+  def volume = {
+    var total = 0
+    cubes.foreach { cube =>
+      val zeroCount = (if(cube.coords._1 == 0) 1 else 0) +
+        (if(cube.coords._2 == 0) 1 else 0) + 
+        (if(cube.coords._3 == 0) 1 else 0)
+
+      total += (1 << (3-zeroCount))
+    }
+
+    total
+  }
 
   def nextLayer = {
     val nextCubes = cubes.flatMap(_.coverLayer)
@@ -135,10 +150,13 @@ object Solid {
       cubes += new Cube(center, sideLengths)
     }
 
-    new Solid(markCovered(cubes.toSeq))
+    val marked = markCovered(cubes.toSeq)
+
+    new Solid(CubeHelper.filterQuadrant(cubes))
   }
 }
 
+/*
 val MAX_N = 200
 val counts = mutable.Map.empty[Int, Int]
 var x = 1
@@ -178,3 +196,4 @@ test_values.foreach { value =>
 }
 
 println(s"Max C: ${counts.values.toSeq.max}")
+*/
