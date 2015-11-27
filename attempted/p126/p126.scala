@@ -164,6 +164,16 @@ def log(counts: Map[Int, Int]) {
   }
 
   println(s"Max C: ${counts.values.toSeq.max}")
+
+  val target = counts.toSeq.filter { case (_, count) => count == 1000 }
+  if(target.nonEmpty)
+    println("Solution found!")
+  else
+    println("Solution not found")
+
+  target.foreach { case (total, count) =>
+    println(s"C($total) == $count")
+  }
 }
 
 def solveIt(maxN: Int): Unit = {
@@ -172,6 +182,7 @@ def solveIt(maxN: Int): Unit = {
   var y = 0
   while(true) {
     y += 1
+    println(s"Working on y == $y.  Max current count is ${if(counts.size == 0) 0 else counts.values.max}")
 
     val minVolume = Solid(y, y, 1).nextLayer.volume
     if(minVolume > maxN) {
@@ -181,17 +192,18 @@ def solveIt(maxN: Int): Unit = {
 
     var z = 1
     var baseSolid = Solid(y, y, z)
-    var baseVolume = baseSolid.nextLayer.volume
+    var baseNext = baseSolid.nextLayer
+    var baseVolume = baseNext.volume
 
     while(z <= y && baseVolume <= maxN) {
-      var incSolid = Solid(y+1, y, z)
-      var increment = incSolid.nextLayer.volume - baseVolume
-
       while(baseVolume <= maxN) {
+        var incSolid = Solid(y+1, y, z)
+        var incNext = incSolid.nextLayer
+        var increment = incNext.volume - baseVolume
+
         var volume = baseVolume
         var x = y
         while(volume <= maxN) {
-          println(s"Doing ($x, $y, $z)")
           counts.getOrElseUpdate(volume, 0)
           counts(volume) += 1
 
@@ -199,16 +211,15 @@ def solveIt(maxN: Int): Unit = {
           x += 1
         }
 
-        baseSolid = baseSolid.nextLayer
-        baseVolume = baseSolid.nextLayer.volume
-
-        incSolid = incSolid.nextLayer
-        increment = incSolid.nextLayer.volume - baseVolume
+        baseSolid = baseNext
+        baseNext = baseSolid.nextLayer
+        baseVolume = baseNext.volume
       }
 
       z += 1
       baseSolid = Solid(y, y, z)
-      baseVolume = baseSolid.nextLayer.volume
+      baseNext = baseSolid.nextLayer
+      baseVolume = baseNext.volume
     }
   }
 }
