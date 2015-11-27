@@ -1,6 +1,6 @@
 import collection.mutable
 
-class Cube(val coords: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(false)) {
+class Cube(val coords: (Int, Int, Int), sideLen: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(false)) {
   require(faceCovered.length == 6, "Invalid faceCovered specification!  Must have 6 entries")
 
   val _faceCovered = faceCovered.toArray
@@ -13,25 +13,29 @@ class Cube(val coords: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(
   lazy val y = coords._2
   lazy val z = coords._3
 
+  lazy val sideX = sideLen._1
+  lazy val sideY = sideLen._2
+  lazy val sideZ = sideLen._3
+
   def coverLayer = {
     val result = mutable.Buffer.empty[Cube]
     if(!_faceCovered(0)) {
-      result += new Cube((1 + x, y, z), Seq(false, false, false, false, false, true))
+      result += new Cube((sideX + x, y, z), sideLen, Seq(false, false, false, false, false, true))
     }
     if(!_faceCovered(1)) {
-      result += new Cube((x, y, 1 + z), Seq(false, false, false, true, false, false))
+      result += new Cube((x, y, sideZ + z), sideLen, Seq(false, false, false, true, false, false))
     }
     if(!_faceCovered(2)) {
-      result += new Cube((x, 1 + y, z), Seq(false, false, false, false, true, false))
+      result += new Cube((x, sideY + y, z), sideLen, Seq(false, false, false, false, true, false))
     }
     if(!_faceCovered(3)) {
-      result += new Cube((x, y, z - 1), Seq(false, true, false, false, false, false))
+      result += new Cube((x, y, z - sideZ), sideLen, Seq(false, true, false, false, false, false))
     }
     if(!_faceCovered(4)) {
-      result += new Cube((x, y - 1, z), Seq(false, false, true, false, false, false))
+      result += new Cube((x, y - sideY, z), sideLen, Seq(false, false, true, false, false, false))
     }
     if(!_faceCovered(5)) {
-      result += new Cube((x - 1, y, z), Seq(true, false, false, false, false, false))
+      result += new Cube((x - sideX, y, z), sideLen, Seq(true, false, false, false, false, false))
     }
 
     //println(s"""From cube ${this}, generating: ${result.mkString(";")}""")
@@ -65,12 +69,12 @@ class Cube(val coords: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(
   }
 
   def applyCoverFromCoordSet(coordSet: Set[(Int, Int, Int)]) {
-    if(coordSet.contains((x + 1, y, z))) setCover(0)
-    if(coordSet.contains((x, y, z + 1))) setCover(1)
-    if(coordSet.contains((x, y + 1, z))) setCover(2)
-    if(coordSet.contains((x, y, z - 1))) setCover(3)
-    if(coordSet.contains((x, y - 1, z))) setCover(4)
-    if(coordSet.contains((x - 1, y, z))) setCover(5)
+    if(coordSet.contains((x + sideX, y, z))) setCover(0)
+    if(coordSet.contains((x, y, z + sideZ))) setCover(1)
+    if(coordSet.contains((x, y + sideY, z))) setCover(2)
+    if(coordSet.contains((x, y, z - sideZ))) setCover(3)
+    if(coordSet.contains((x, y - sideY, z))) setCover(4)
+    if(coordSet.contains((x - sideX, y, z))) setCover(5)
   }
 }
 
@@ -113,21 +117,29 @@ object Solid {
     cubes
   }
 
+  def _side(n: Int) = if(n % 2 == 0) 2 else 1
+
+  def _min(n: Int) = if(n % 2 == 0) -(n-1) else (-(n-1)/2)
+
+  def _max(n: Int) = if(n % 2 == 0) (n-1) else ((n-1)/2)
+
   def apply(nx: Int, ny: Int, nz: Int) = {
     val cubes = mutable.Buffer.empty[Cube]
+    val sideLengths = (_side(nx), _side(ny), _side(nz))
     for {
-      x <- 0 until nx
-      y <- 0 until ny
-      z <- 0 until nz
+      x <- _min(nx) to _max(nx) by sideLengths._1
+      y <- _min(ny) to _max(ny) by sideLengths._2
+      z <- _min(nz) to _max(nz) by sideLengths._3
     } {
-      cubes += new Cube((x, y, z))
+      val center = (x, y, z)
+      cubes += new Cube(center, sideLengths)
     }
 
     new Solid(markCovered(cubes.toSeq))
   }
 }
 
-val MAX_N = 1600
+val MAX_N = 200
 val counts = mutable.Map.empty[Int, Int]
 var x = 1
 var solid = Solid(1,1,1)
