@@ -1,0 +1,18 @@
+run from in the REPL:
+
+> :load p126.scala
+
+> solveIt(19000)
+...
+C(22) == 2
+C(46) == 4
+C(78) == 5
+C(118) == 8
+C(154) == 10
+Max C: 1320
+Solution found!
+C(18576) == 1000
+C(18880) == 1000
+C(18522) == 1000
+
+Takes a while but it gets it.
