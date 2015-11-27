@@ -106,7 +106,7 @@ object Solid {
   }
 }
 
-val MAX_N = 1600
+val MAX_N = 200
 val counts = mutable.Map.empty[Int, Int]
 var x = 1
 var solid = Solid(1,1,1)
