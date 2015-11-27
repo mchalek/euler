@@ -164,6 +164,16 @@ def log(counts: Map[Int, Int]) {
   }
 
   println(s"Max C: ${counts.values.toSeq.max}")
+  
+  val target = counts.toSeq.filter { case (_, count) => count == 1000 }
+    if(target.nonEmpty)
+      println("Solution found!")
+    else
+      println("Solution not found")
+
+  target.foreach { case (total, count) =>
+      println(s"C($total) == $count")
+  }
 }
 
 def solveIt(maxN: Int): Unit = {
