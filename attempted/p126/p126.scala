@@ -1,5 +1,13 @@
 import collection.mutable
 
+
+// I built this whole apparatus for brute-force computing the covering layer
+// size, taking advantage of the 3-way symmetry of these objects.
+// But that was still not enough, so I had to observe the fact that
+// L(x, y, z) - L(x-1, y, z) is a constant for fixed (y, z) and any x.
+// I could probably take further advantage of more relationships like that
+// but this was good enough.
+
 class Cube(val coords: (Int, Int, Int), sideLen: (Int, Int, Int), faceCovered: Seq[Boolean] = Seq.fill(6)(false)) {
   require(faceCovered.length == 6, "Invalid faceCovered specification!  Must have 6 entries")
 
