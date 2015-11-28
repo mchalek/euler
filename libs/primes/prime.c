@@ -81,7 +81,8 @@ void primes(long N, long **p, long *k_out)
    uint64_t i, j;
    uint64_t uiN = (uint64_t) N; // we know conversion is okay because N >= 2
    uint64_t nword = (uiN + 127) / 128;
-   uint64_t *cmp = aligned_alloc(16, nword * sizeof(uint64_t));
+   uint64_t *cmp;
+   posix_memalign((void **) &cmp, 16, nword * sizeof(uint64_t));
    memset(cmp, 0, nword * sizeof(uint64_t));
 
    long nalloc = 1024;
