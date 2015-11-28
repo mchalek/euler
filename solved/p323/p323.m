@@ -14,4 +14,4 @@ for n = 1:nmax,
     AvgN = AvgN + n*sum(M*An);
     An = A * An;
 end;
-disp(AvgN);
+fprintf('%.10f\n', AvgN)
