@@ -9,7 +9,7 @@
 #define MIN(a, b) (((a) > (b)) ? (b) : (a))
 
 #ifndef __KM_RAND_H
-inline long rand_int(long a, long b) {
+static inline long rand_int(long a, long b) {
     long x = rand() % (b-a);
 
     return a + x;
