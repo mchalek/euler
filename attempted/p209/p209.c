@@ -75,11 +75,34 @@ int main(void) {
 
     for(i = 0; i < 64; i++) {
         map[i] = transform(i);
-        printf("H(%d) == %d\n", i , map[i]);
     }
 
-    long count = build(0, 0, map, 0);
+    int n_cycles = 0;
+    unsigned char cycle_ind[64];
+    memset(cycle_ind, 0xff, sizeof(cycle_ind));
+    for(i = 0; i < 64; i++) {
+        if(cycle_ind[i] != 0xff)
+            continue;
 
-    printf("result: %ld\n", count);
+        cycle_ind[i] = (unsigned char) n_cycles;
+        int j = map[i];
+        printf("cycle %d: %2d => %2d", n_cycles, i, j);
+        while(j != i) {
+            cycle_ind[j] = (unsigned char) n_cycles;
+            j = map[j];
+            printf(" => %2d", j);
+        }
+        printf("\n");
+
+        n_cycles++;
+    }
+
+    for(i = 0; i < 64; i++) {
+        printf("H(%d) == %d (cycle index %d)\n", i , map[i], (int) cycle_ind[i]);
+    }
+
+    //long count = build(0, 0, map, 0);
+
+    //printf("result: %ld\n", count);
     return 0;
 }
