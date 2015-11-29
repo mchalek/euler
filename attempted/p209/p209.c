@@ -4,6 +4,22 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/* Some observations:
+ * There are 64 possible inputs (a, b, c, d, e, f).
+ * - The transformation specified, t(a,b,c,d,e,f) => t(b,c,d,e,f,a ^ (b & c)),
+ *   defines a permutation of the inputs (i.e. it is 1-1)
+ * - Let I be an input, and pI be the permuted input.  The problem constraint
+ *   t(I) & t(pI) == 0 requires t(I) == 0 OR t(pI) == 0 (OR both)
+ * - Consider counting tables for which the converse is true,
+ *   t(I) == 1 AND t(pI) == 1, for any I.  Suppose t(I) == 1 and t(pI) == 1,
+ *   for some I.  Then we also have that t(p^2I) == 1, t(p^3I) == 1, ...
+ *   So we can partition the inputs into cosets/equivalence classes and
+ *   exhaust over possible values of these.
+ * - Can compute the total count by inclusion/exclusion or something like that?
+ *   e.g. Let C_j be a coset.  Then
+ *   N == 2^64 - |Union_j { (# tables with C_j == 1) }|
+ */
+
 int transform(int x) {
     int a = 1 & (x >> 5);
     int b = 1 & (x >> 4);
