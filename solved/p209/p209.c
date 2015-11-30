@@ -70,8 +70,7 @@ int main(void) {
         int j = map[i];
         printf("cycle %d: %2d => %2d", n_cycles, i, j);
         while(j != i) {
-            if(j != i)
-                cycle_length++;
+            cycle_length++;
             cycle_ind[j] = (unsigned char) n_cycles;
             j = map[j];
             printf(" => %2d", j);
