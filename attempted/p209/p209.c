@@ -134,7 +134,6 @@ int main(void) {
             printf(" => %2d", j);
         }
 
-
         long nseq = cycle_count(cycle_length);
         printf(" (length is %d, %ld valid sequences)\n", cycle_length, nseq);
 
