@@ -8,19 +8,24 @@ object Dead extends State {
   def children = Map(Dead -> 1.0)
 }
 
-case class Alive(nnz_unique: Int, nz: Int) extends State {
+case class Alive(nnz_unique: Int, n500: Int, nz: Int) extends State {
   def children: Map[State, Double] = {
     // return the possible states that this state can yield after a draw
 
     // first we just increment nnz_unique:
     val pAllZero = 1d / 1000
-    val pMissExistingNonZero = (999 - 2*nnz_unique)/1000d
+    val p500 = 1d / 1000
+    val pMissExistingNonZero = (998 - 2*nnz_unique)/1000d
     val pMatchExistingNonZero = nnz_unique / 1000d
     val pHit = nnz_unique / 1000d
-    Map(Alive(1+nnz_unique, nz) -> pMissExistingNonZero,
-      Alive(nnz_unique, nz) -> pMatchExistingNonZero,
-      Alive(nnz_unique, 1+nz) -> pAllZero,
-      Dead -> pHit)
+    Map(Alive(1+nnz_unique, n500, nz) -> pMissExistingNonZero,
+      Alive(nnz_unique, n500, nz) -> pMatchExistingNonZero,
+      Alive(nnz_unique, n500, 1+nz) -> pAllZero) ++
+        (if(n500 > 0) {
+          Map(Dead -> (pHit + p500))
+        } else {
+          Map(Alive(nnz_unique, 1, nz) -> p500, Dead -> pHit)
+        })
   }
 }
 
@@ -56,10 +61,10 @@ def compute: Double = {
     _compute(posterior, result + (1+n)*deltaPDead, 1 + n, maxN)
   }
   
-  val prior = Map(Alive(1, 0) -> (999d/1000), Dead -> (1d/1000))
+  val prior = Map(Alive(1, 0, 0) -> (998d/1000), Alive(0, 1, 0) -> (1d/1000), Dead -> (1d/1000))
 
-  _compute(prior, 0d, 1, 400)
+  _compute(prior, 0d, 1, 300)
 }
 
 
-println("Result: %.9f".format(compute))
+println("Result: %.8f".format(compute))
