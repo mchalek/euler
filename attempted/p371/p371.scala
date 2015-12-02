@@ -1,15 +1,15 @@
 import scala.annotation.tailrec
 
 trait State {
-  def children: Map[State, Double]
+  def children: Seq[(State, Double)]
 }
 
 object Dead extends State {
-  def children = Map(Dead -> 1.0)
+  def children = Seq(Dead -> 1.0)
 }
 
 case class Alive(nnz_unique: Int, n500: Int, nz: Int) extends State {
-  def children: Map[State, Double] = {
+  def children: Seq[(State, Double)] = {
     // return the possible states that this state can yield after a draw
 
     // first we just increment nnz_unique:
@@ -18,7 +18,7 @@ case class Alive(nnz_unique: Int, n500: Int, nz: Int) extends State {
     val pMissExistingNonZero = (998 - 2*nnz_unique)/1000d
     val pMatchExistingNonZero = nnz_unique / 1000d
     val pHit = (n500 + nnz_unique) / 1000d
-    Map(Alive(1+nnz_unique, n500, nz) -> pMissExistingNonZero,
+    Seq(Alive(1+nnz_unique, n500, nz) -> pMissExistingNonZero,
       Alive(nnz_unique, n500, nz) -> pMatchExistingNonZero,
       Alive(nnz_unique, n500, 1+nz) -> pAllZero,
       Alive(nnz_unique, 1+n500, nz) -> p500,
@@ -28,7 +28,7 @@ case class Alive(nnz_unique: Int, n500: Int, nz: Int) extends State {
 
 def update(prior: Map[State, Double]): Map[State, Double] = {
   val posteriorDisassociated = prior.toSeq.flatMap { case (parent, pParent) =>
-    parent.children.toSeq.map { case (child, pChild) =>
+    parent.children.map { case (child, pChild) =>
       child -> (pChild * pParent)
     }
   }
