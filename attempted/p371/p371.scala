@@ -14,18 +14,15 @@ case class Alive(nnz_unique: Int, n500: Int, nz: Int) extends State {
 
     // first we just increment nnz_unique:
     val pAllZero = 1d / 1000
-    val p500 = 1d / 1000
+    val p500 = (1 - n500) / 1000d
     val pMissExistingNonZero = (998 - 2*nnz_unique)/1000d
     val pMatchExistingNonZero = nnz_unique / 1000d
-    val pHit = nnz_unique / 1000d
+    val pHit = (n500 + nnz_unique) / 1000d
     Map(Alive(1+nnz_unique, n500, nz) -> pMissExistingNonZero,
       Alive(nnz_unique, n500, nz) -> pMatchExistingNonZero,
-      Alive(nnz_unique, n500, 1+nz) -> pAllZero) ++
-        (if(n500 > 0) {
-          Map(Dead -> (pHit + p500))
-        } else {
-          Map(Alive(nnz_unique, 1, nz) -> p500, Dead -> pHit)
-        })
+      Alive(nnz_unique, n500, 1+nz) -> pAllZero,
+      Alive(nnz_unique, 1+n500, nz) -> p500,
+      Dead -> pHit).filter(_._2 > 0)
   }
 }
 
@@ -63,7 +60,7 @@ def compute: Double = {
   
   val prior = Map(Alive(1, 0, 0) -> (998d/1000), Alive(0, 1, 0) -> (1d/1000), Dead -> (1d/1000))
 
-  _compute(prior, 0d, 1, 300)
+  _compute(prior, 0d, 1, 250)
 }
 
 
