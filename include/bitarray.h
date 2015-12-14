@@ -31,24 +31,24 @@ void bitarray_init(size_t size, bitarray_t *ba)
     size_t num_words = (size + bits_per_word - 1) / bits_per_word;
     ba->num_words = num_words;
 
-    posx_memalign(&(ba->bits), ALIGNMENT_BYTES, num_words);
+    posix_memalign((void **) &(ba->bits), ALIGNMENT_BYTES, num_words);
     clear(ba);
 }
 
-#define get_word(idx, pba) ((pba)->bits[((idx) / ((pba)->bits_per_word))])
-#define bit_pos(idx, pba) ((idx) % ((pba)->bits_per_word))
+#define GET_WORD(idx, pba) ((pba)->bits[((idx) / ((pba)->bits_per_word))])
+#define BIT_POS(idx, pba) ((idx) % ((pba)->bits_per_word))
 
 static inline int get_bit(int64_t index, bitarray_t *ba)
 {
     if(index < 0)
         return -1;
 
-    return 1 & (get_word(index, ba) >> bit_pos(indx, ba))
+    return 1 & (GET_WORD(index, ba) >> BIT_POS(index, ba));
 }
 
 static inline void set_bit(int64_t index, bitarray_t *ba)
 {
-    get_word(index, ba) |= (UNIT << bit_pos(index, ba));
+    GET_WORD(index, ba) |= (UNIT << BIT_POS(index, ba));
 }
 
 #endif

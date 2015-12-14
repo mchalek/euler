@@ -1,9 +1,10 @@
 #include <stdio.h>
+#include <bitarray.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
 
-#if 0
+#if 1
 
 #define p 19
 #define q 37
@@ -18,10 +19,10 @@
 #define n (p*q)
 #define phi ((p-1)*(q-1))
 
-int _find_order(const long m, long x, int order, char hit[]) 
+int _find_order(const long m, long x, int order, bitarray_t *ba) 
 {
-    while(!hit[x]) {
-        hit[x] = 1;
+    while(!get_bit(x, ba)) {
+        set_bit(x, ba);
         x *= m;
         x %= n;
         order += 1;
@@ -30,10 +31,10 @@ int _find_order(const long m, long x, int order, char hit[])
     return order;
 }
 
-int find_order(long m, char *hit)
+int find_order(long m, bitarray_t *ba)
 {
-    memset(hit, 0, n*sizeof(char));
-    return m ? _find_order(m, m*m, 1, hit) : 1;
+    clear(ba);
+    return m ? _find_order(m, m*m, 1, ba) : 1;
 }
 
 void sieve(int order, int unconcealed_count[])
@@ -62,10 +63,17 @@ int main(void) {
     int m;
 
     int *unconcealed_count = calloc(phi, sizeof(int));
-    char *work = malloc(n*sizeof(char));
+    bitarray_t bt;
+    bitarray_init(n, &bt);
 
     for(m = 0; m < n; m++) {
-        int order = find_order(m, work);
+        if(!(m % p))
+            continue;
+
+        if(!(m % q))
+            continue;
+
+        int order = find_order(m, &bt);
 
         sieve(order, unconcealed_count);
         fprintf(stderr, "order(%d): %d\n", m, order);
