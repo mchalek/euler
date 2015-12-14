@@ -21,8 +21,8 @@
 
 int _find_order(const long m, long x, int order, bitarray_t *ba) 
 {
-    while(!get_bit(x, ba)) {
-        set_bit(x, ba);
+    while(x != 1) {
+        //set_bit(x, ba);
         x *= m;
         x %= n;
         order += 1;
@@ -33,8 +33,11 @@ int _find_order(const long m, long x, int order, bitarray_t *ba)
 
 int find_order(long m, bitarray_t *ba)
 {
+    if(m == 0 || m == 1)
+        return 1;
+
     clear(ba);
-    return m ? _find_order(m, m*m, 1, ba) : 1;
+    return _find_order(m, m, 1, ba);
 }
 
 void sieve(int order, int unconcealed_count[])
@@ -91,6 +94,9 @@ int main(void) {
     
     int sum_e = 0;
     for(e = 2; e < phi; e++) {
+        if(e != 181)
+            continue;
+        printf("uc[%d]: %d\n", e, unconcealed_count[e]);
         if(unconcealed_count[e] == min_count) {
             printf("e == %4d achieves minimum unconcealed count\n", e);
             sum_e += e;

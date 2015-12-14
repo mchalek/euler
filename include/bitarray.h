@@ -35,13 +35,16 @@ void bitarray_init(size_t size, bitarray_t *ba)
     clear(ba);
 }
 
-#define GET_WORD(idx, pba) ((pba)->bits[((idx) / ((pba)->bits_per_word))])
+#define GET_WORD(idx, pba) ((pba)->bits[(idx) / ((pba)->bits_per_word)])
 #define BIT_POS(idx, pba) ((idx) % ((pba)->bits_per_word))
 
 static inline int get_bit(int64_t index, bitarray_t *ba)
 {
-    if(index < 0)
+    if(index < 0 || index >= (int64_t) ba->size) {
+        // intentionally crash
+        ba->bits[ba->size+1000] = 10;
         return -1;
+    }
 
     return 1 & (GET_WORD(index, ba) >> BIT_POS(index, ba));
 }
