@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#if 1
+#if 0
 
 #define p 19
 #define q 37
@@ -15,6 +15,8 @@
 #define q 3643
 
 #endif
+
+//#define __DEBUG__
 
 #define n (p*q)
 #define phi ((p-1)*(q-1))
@@ -69,6 +71,7 @@ int main(void) {
     bitarray_t bt;
     bitarray_init(n, &bt);
 
+    fprintf(stderr, "%6.3f%% complete\b\b\b\b\b\b\b\b\b\b", 0.0); 
     for(m = 0; m < n; m++) {
         if(!(m % p))
             continue;
@@ -79,7 +82,13 @@ int main(void) {
         int order = find_order(m, &bt);
 
         sieve(order, unconcealed_count);
+#ifdef __DEBUG__
         fprintf(stderr, "order(%d): %d\n", m, order);
+#else
+        if(!(m % 500)) {
+            fprintf(stderr, "\b\b\b\b\b\b\b%6.3f", 100*((double) m) / n);
+        }
+#endif
     }
 
     int min_count = n;
@@ -94,9 +103,6 @@ int main(void) {
     
     int sum_e = 0;
     for(e = 2; e < phi; e++) {
-        if(e != 181)
-            continue;
-        printf("uc[%d]: %d\n", e, unconcealed_count[e]);
         if(unconcealed_count[e] == min_count) {
             printf("e == %4d achieves minimum unconcealed count\n", e);
             sum_e += e;
