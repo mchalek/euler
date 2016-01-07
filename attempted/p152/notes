@@ -29,3 +29,9 @@ steps can be:
     - this will be very restrictive, usually...
   - then we still need to figure out how many ways there are to construct this
     set of numbers, and whether those constructions satisfy equality, above
+
+
+*** Right now I have my doubts.  Too complicated, kind of slower than expected,
+    and the third bullet above is still unclear.  We have not used any more
+    interesting mathematical relationships... surely there's something we
+    can do
