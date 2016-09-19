@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include <prime.h>
 
+
+// If m^e == m mod (p * q), then
+// m^(e-1) == 1 mod (p * q), then
+// m^(e-1) == 1 mod p, and m^(e-1) == 1 mod q.
+//
+// Solve by finding the multiplicative order of m (mod p) in Z mod p and of m (mod q) in Z mod q.
+// Then the multiplicative order of m mod (p * q) is the least common multiple of these two
+// multiplicative orders.  From this we can build the set of e's for which a given message m
+// is unconcealed.
+
 #if 0
 #define pp 19
 #define qq 37
