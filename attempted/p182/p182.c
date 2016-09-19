@@ -1,114 +1,151 @@
 #include <stdio.h>
-#include <bitarray.h>
-#include <string.h>
 #include <stdlib.h>
-#include <stdint.h>
+#include <prime.h>
 
 #if 0
-
-#define p 19
-#define q 37
-
+#define pp 19
+#define qq 37
 #else
-
-#define p 1009
-#define q 3643
-
+#define pp 1009
+#define qq 3643
 #endif
 
-//#define __DEBUG__
+#define phi ((pp-1)*(qq-1))
 
-#define n (p*q)
-#define phi ((p-1)*(q-1))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-int _find_order(const long m, long x, int order, bitarray_t *ba) 
-{
-    while(x != 1) {
-        //set_bit(x, ba);
-        x *= m;
-        x %= n;
-        order += 1;
+int *order_p = NULL;
+int *order_q = NULL;
+int *unconcealed_count = NULL;
+int *valid_e = NULL;
+
+int compute_order(int x, int modulus) {
+    int result = 1;
+    int n = x;
+
+    while(n != 1) {
+        result++;
+        n *= x;
+        n %= modulus;
     }
 
-    return order;
+    return result;
 }
 
-int find_order(long m, bitarray_t *ba)
-{
-    if(m == 0 || m == 1)
-        return 1;
-
-    clear(ba);
-    return _find_order(m, m, 1, ba);
-}
-
-void sieve(int order, int unconcealed_count[])
-{
-    int k;
-    for(k = 1 + order; k < phi; k += order) {
-        unconcealed_count[k] += 1;
+void fill_orders(int modulus, int *out) {
+    int i;
+    for(i = 1; i < modulus; i++) {
+        out[i] = compute_order(i, modulus);
     }
 }
 
-int test(int e) {
-    // make sure that gcd(e, phi) == 1
-    
-    int gcd = 2;
-    while(gcd < (phi/2)) {
-        if(!(e % gcd) && !(phi % gcd))
-            return gcd;
-
-        gcd += 1;
+void determine_valid_e() {
+    valid_e = calloc(phi, sizeof(int));
+    int e;
+    for(e = 1; e < phi; e++) {
+        valid_e[e] = 1;
     }
 
-    return 1;
+    // e must be coprime to phi.  Assemble primes up to max of p and q
+    // and then mark as invalid all e's that share a prime with (p-1) or (q-1)
+    long *p;
+    long np;
+    primes(MAX(pp, qq), &p, &np);
+
+    long ip;
+
+    for(ip = 0; ip < np; ip++) {
+        long factor = p[ip];
+        if(((pp-1) % factor) && ((qq-1) % factor)) {
+            continue;
+        }
+
+        long bad_e = factor;
+        while(bad_e < phi) {
+            valid_e[bad_e] = 0;
+            bad_e += factor;
+        }
+    }
+}
+
+void init() {
+
+    determine_valid_e();
+
+    order_p = calloc(pp, sizeof(int));
+    fill_orders(pp, order_p);
+
+    order_q = calloc(qq, sizeof(int));
+    fill_orders(qq, order_q);
+
+    unconcealed_count = calloc(phi, sizeof(int));
+}
+
+int lcm(int m, int n) {
+    int i = n;
+    while(i % m) {
+        i += n;
+    }
+
+    return i;
+}
+
+void compute_unconcealed(int m) {
+    int mpp = m % pp;
+    int mqq = m % qq;
+
+    if(!mpp || !mqq) {
+        return;
+    }
+
+    int ep = order_p[mpp];
+    int eq = order_q[mqq];
+
+    int e = lcm(ep, eq);
+
+    //printf("O[%d] == %d\n", m, e);
+
+    int i;
+    for(i = e + 1; i < phi; i += e) {
+        //printf("%d ^ %d == %d mod %d\n", m, i, m, pp*qq);
+        unconcealed_count[i]++;
+    }
+}
+
+int min_unconcealed() {
+    int e;
+    int result = pp*qq;
+    for(e = 2; e < phi; e++) {
+        if(unconcealed_count[e] < result && valid_e[e]) {
+            result = unconcealed_count[e];
+        }
+    }
+
+    return result;
 }
 
 int main(void) {
+    init();
+
     int m;
-
-    int *unconcealed_count = calloc(phi, sizeof(int));
-    bitarray_t bt;
-    bitarray_init(n, &bt);
-
-    fprintf(stderr, "%6.3f%% complete\b\b\b\b\b\b\b\b\b\b", 0.0); 
-    for(m = 0; m < n; m++) {
-        if(!(m % p))
-            continue;
-
-        if(!(m % q))
-            continue;
-
-        int order = find_order(m, &bt);
-
-        sieve(order, unconcealed_count);
-#ifdef __DEBUG__
-        fprintf(stderr, "order(%d): %d\n", m, order);
-#else
-        if(!(m % 500)) {
-            fprintf(stderr, "\b\b\b\b\b\b\b%6.3f", 100*((double) m) / n);
-        }
-#endif
+    for(m = 1; m < (pp*qq); m++) {
+        compute_unconcealed(m);
     }
-
-    int min_count = n;
-    int e;
-    for(e = 2; e < phi; e++) {
-        //printf("unconcealed_count[181]: %d\n", unconcealed_count[e]);
-        if(unconcealed_count[e] < min_count && test(e) == 1)
-            min_count = unconcealed_count[e];
-    }
-
-    printf("smallest number of unconcealed messages: %d\n", min_count);
     
-    int sum_e = 0;
+    int mu = min_unconcealed();
+    //printf("min unconcealed count: %d\n", mu);
+
+    int e;
+    long Se = 0l;
     for(e = 2; e < phi; e++) {
-        if(unconcealed_count[e] == min_count) {
-            printf("e == %4d achieves minimum unconcealed count\n", e);
-            sum_e += e;
+        //printf("unconcealed_count[%d]: %d\n", e, unconcealed_count[e]);
+
+        if(unconcealed_count[e] == mu && valid_e[e]) {
+            //printf("e == %4d achieves minimum unconcealed count of %d\n", e, mu);
+            Se += e;
         }
     }
-    printf("result: %d\n", sum_e);
 
-    return 0;
+    printf("result: %ld\n", Se);
 }
+
