@@ -30,14 +30,16 @@ int mask_to_digits(int mask, int digits[]) {
 
 void build_permutations(int digits_used_mask, int perm, int perm_len, int ndig, int digits[], int *nperm, int permutations[]) {
     if(perm_len == ndig) {
-        permutations[(*nperm)++] = perm;
+        //permutations[(*nperm)++] = perm;
+        (*nperm)++;
+        printf("%d\n", perm);
         return;
     }
 
     int i;
     for(i = 0; i < ndig; i++) {
         int bit = 1 << i;
-        if(digits_used_mask & i) {
+        if(digits_used_mask & bit) {
             continue;
         }
 
@@ -87,7 +89,7 @@ void build_from_masks(int ma, int mb, int mc) {
     int *perms_b = malloc(n_perm_b * sizeof(int));
     int *perms_c = malloc(n_perm_c * sizeof(int));
 
-    int n_perm_test_a, n_perm_test_b, n_perm_test_c;
+    int n_perm_test_a = 0, n_perm_test_b = 0, n_perm_test_c = 0;
 
     build_permutations(0, 0, 0, ndig_a, dig_a, &n_perm_test_a, perms_a);
     build_permutations(0, 0, 0, ndig_b, dig_b, &n_perm_test_b, perms_b);
@@ -144,8 +146,20 @@ void build_from_masks(int ma, int mb, int mc) {
 }
 
 int main() {
-    int mask_A, mask_B, mask_C;
+    int mask_a, mask_b, mask_c;
+    mask_a = 0x7;
+    int dig_a[10];
+    const int ndig_a = mask_to_digits(mask_a, dig_a);
+    printf("ndig(%x): %d\n", mask_a, ndig_a);
+    int i;
+    for(i = 0; i < ndig_a; i++) {
+        printf("digit: %d\n", dig_a[i]);
+    }
 
+    int nperm = 0;
+    build_permutations(0, 0, 0, ndig_a, dig_a, &nperm, NULL);
+
+    /*
     for(mask_A = 1; mask_A < (1 << 10); mask_A++) {
         for(mask_B = 1; mask_B < (1 << 10); mask_B++) {
             if(mask_A & mask_B) {
@@ -156,6 +170,6 @@ int main() {
 
             build_from_masks(mask_A, mask_B, mask_C);
         }
-    }
+    }*/
     return 0;
 }
