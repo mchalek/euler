@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Kind of a brute-force solution.  Partition {0, 1, ... 9} into 3 or more
+// sets of digits, loop over all permutations of each of those digits and check
+// whether necessary conditions are satisfied.
+
 #define ALL_DIGIT_MASK ((1 << 10) - 1)
 //#define __DEBUG__
 
