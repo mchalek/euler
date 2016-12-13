@@ -3,6 +3,10 @@
 
 // the code here is working but it's too brute-force to get to the target solution
 // in a reasonable amount of time.
+//
+// ** UPDATE **: actually it only took a few mins.  But still the approach below
+// would be much better.
+//
 // for the target reflection count, the "depth" in the virtual reflection
 // space is 6008819575 (== (r + 3) / 2), and vertex C virtual indices are on
 // stride 2 (== -d % 3).
