@@ -184,6 +184,9 @@ void evaluate_masks(int maskA, int k, int maskB[]) {
     long npermA = build_perms(maskA, &perm_A);
     for(i = 0; i < npermA; i++) {
         int A = perm_A[i];
+        if(A > 49) {
+            continue;
+        }
 
         evaluate_concatenations(A, k, maskB, B, 0, 0, products);
     }
